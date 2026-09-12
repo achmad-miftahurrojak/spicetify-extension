@@ -2,11 +2,13 @@
    Smooth hover effects for sidebar icons */
 
 .main-rootlist-rootlistItem img,
-.main-yourLibraryX-listItem img {
+.main-yourLibraryX-listItem img,
+.main-yourLibraryX-listItem .x-entityImage-imageContainer {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .main-rootlist-rootlistItem:hover img,
-.main-yourLibraryX-listItem:hover img {
+.main-yourLibraryX-listItem:hover img,
+.main-yourLibraryX-listItem:hover .x-entityImage-imageContainer {
   transform: scale(1.1);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
 }
