@@ -10,3 +10,85 @@
   transform: scale(1.1);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
 }
+
+/* Spiceflow Custom Tooltip */
+#spiceflow-tooltip {
+  position: fixed;
+  z-index: 99999;
+  background-color: var(--spice-card, #181818);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  padding: 12px;
+  width: 280px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#spiceflow-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.spiceflow-tooltip-content {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.spiceflow-cover {
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.spiceflow-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.spiceflow-title {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--spice-text, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spiceflow-owner {
+  font-size: 12px;
+  color: var(--spice-subtext, #a7a7a7);
+}
+
+.spiceflow-tracks {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  gap: 2px;
+}
+
+.spiceflow-tracks span {
+  font-size: 11px;
+  color: var(--spice-subtext, #a7a7a7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spiceflow-loading {
+  font-size: 12px;
+  color: var(--spice-subtext, #a7a7a7);
+  text-align: center;
+  padding: 8px;
+}
+
+/* Sembunyikan default tippy saat hover library jika dimungkinkan */
+.main-yourLibraryX-listItem[aria-describedby] {
+  /* Trik untuk menghindari tooltip bawaan jika bisa */
+}

@@ -7,6 +7,7 @@ if not exist "%appdata%\spicetify\Themes\Spiceflow" mkdir "%appdata%\spicetify\T
 :: Copy file ke folder theme spicetify
 copy /Y "%~dp0color.ini" "%appdata%\spicetify\Themes\Spiceflow\" >nul
 copy /Y "%~dp0user.css" "%appdata%\spicetify\Themes\Spiceflow\" >nul
+copy /Y "%~dp0theme.js" "%appdata%\spicetify\Themes\Spiceflow\" >nul
 
 echo Mengatur tema ke Spiceflow...
 spicetify config current_theme Spiceflow
