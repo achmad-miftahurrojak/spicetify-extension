@@ -35,6 +35,56 @@
         }
     }
 
+    function findPlaylistId(element) {
+        // Coba 1: a[href]
+        const link = element.querySelector("a[href*='playlist']");
+        if (link) {
+            const href = link.getAttribute("href");
+            const parts = href.split(/[:/]/);
+            return parts[parts.length - 1].split('?')[0];
+        }
+
+        // Coba 2: React Props Traversal (Spicetify Hack)
+        let foundId = null;
+        function searchNode(node) {
+            if (foundId) return;
+            const propKey = Object.keys(node).find(k => k.startsWith("__reactProps$"));
+            if (!propKey) return;
+            
+            const seen = new Set();
+            function traverse(obj, depth = 0) {
+                if (foundId || depth > 5 || !obj || typeof obj !== 'object') return;
+                if (seen.has(obj)) return;
+                seen.add(obj);
+
+                for (const key in obj) {
+                    const val = obj[key];
+                    if (typeof val === 'string' && val.includes('spotify:playlist:')) {
+                        foundId = val.split(':').pop();
+                        return;
+                    }
+                    if (val && typeof val === 'object') {
+                        traverse(val, depth + 1);
+                    }
+                }
+            }
+            traverse(node[propKey]);
+        }
+
+        // Cek elemen root
+        searchNode(element);
+        if (foundId) return foundId;
+
+        // Cek semua children (terkadang props ada di elemen div bagian dalam)
+        const children = element.querySelectorAll("*");
+        for (let i = 0; i < children.length; i++) {
+            if (foundId) break;
+            searchNode(children[i]);
+        }
+
+        return foundId;
+    }
+
     document.addEventListener("mouseover", async (e) => {
         const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
         
@@ -44,28 +94,17 @@
             return;
         }
 
-        // Cari elemen yang menyimpan URI, biasanya ada context menu atau link
-        let uri = null;
+        const id = findPlaylistId(item);
         
-        // 1. Coba cari dari href link
-        const link = item.querySelector("a[href]");
-        if (link) {
-            const href = link.getAttribute("href");
-            if (href.includes("playlist")) {
-                const urlParts = href.split(/[:/]/);
-                const id = urlParts[urlParts.length - 1];
-                uri = `spotify:playlist:${id}`;
-            }
-        }
-        
-        // 2. Jika tidak ketemu, coba cari properti React atau URI di DOM (fallback)
-        if (!uri) {
-            console.log("Spiceflow: Hovered item tapi tidak ada a[href] playlist", item);
+        if (!id) {
+            console.log("Spiceflow: Hovered item tapi tidak ditemukan ID playlist di DOM/React Props", item);
             return;
         }
 
+        const uri = `spotify:playlist:${id}`;
         console.log("Spiceflow: Terdeteksi hover pada URI:", uri);
         currentHover = uri;
+        
         const rect = item.getBoundingClientRect();
         
         tooltip.innerHTML = `<div class="spiceflow-loading">Loading preview...</div>`;
