@@ -3,3 +3,6 @@ dist/
 *.log
 .DS_Store
 .turbo/
+temp/
+temp2/
+temp3/
