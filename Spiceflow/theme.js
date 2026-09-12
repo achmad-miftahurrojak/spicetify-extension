@@ -1,7 +1,11 @@
 (async function Spiceflow() {
+    console.log("Spiceflow: Script injected and running!");
+
     while (!Spicetify?.CosmosAsync || !Spicetify?.Platform) {
         await new Promise(resolve => setTimeout(resolve, 100));
     }
+    
+    console.log("Spiceflow: Spicetify API ready!");
 
     const cache = new Map();
     let currentHover = null;
@@ -15,6 +19,7 @@
         if (cache.has(uri)) return cache.get(uri);
         try {
             const id = uri.split(":")[2];
+            console.log("Spiceflow: Fetching data for", id);
             const data = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/playlists/${id}`);
             const result = {
                 image: data.images?.[0]?.url,
@@ -25,7 +30,7 @@
             cache.set(uri, result);
             return result;
         } catch (e) {
-            console.error("Spiceflow error:", e);
+            console.error("Spiceflow error fetching data:", e);
             return null;
         }
     }
@@ -39,19 +44,27 @@
             return;
         }
 
-        // Cari semua anchor tag di dalam item
+        // Cari elemen yang menyimpan URI, biasanya ada context menu atau link
+        let uri = null;
+        
+        // 1. Coba cari dari href link
         const link = item.querySelector("a[href]");
-        if (!link) return;
+        if (link) {
+            const href = link.getAttribute("href");
+            if (href.includes("playlist")) {
+                const urlParts = href.split(/[:/]/);
+                const id = urlParts[urlParts.length - 1];
+                uri = `spotify:playlist:${id}`;
+            }
+        }
+        
+        // 2. Jika tidak ketemu, coba cari properti React atau URI di DOM (fallback)
+        if (!uri) {
+            console.log("Spiceflow: Hovered item tapi tidak ada a[href] playlist", item);
+            return;
+        }
 
-        const href = link.getAttribute("href");
-        // Pastikan ini adalah playlist
-        if (!href.includes("playlist")) return;
-
-        // Extract ID dari href (contoh href: /playlist/37i9dQZF1DXcBWIGoYBM5M atau spotify:playlist:xxx)
-        const urlParts = href.split(/[:/]/);
-        const id = urlParts[urlParts.length - 1];
-        const uri = `spotify:playlist:${id}`;
-
+        console.log("Spiceflow: Terdeteksi hover pada URI:", uri);
         currentHover = uri;
         const rect = item.getBoundingClientRect();
         
