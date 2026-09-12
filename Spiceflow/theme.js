@@ -9,48 +9,32 @@
 
     const cache = new Map();
     let currentHover = null;
+    let hoverTimeout = null;
 
-    // Create Tooltip DOM
     const tooltip = document.createElement("div");
     tooltip.id = "spiceflow-tooltip";
     document.body.appendChild(tooltip);
 
-    async function fetchPlaylistData(uri) {
+    async function fetchPlaylistTracks(uri) {
         if (cache.has(uri)) return cache.get(uri);
         try {
             const id = uri.split(":")[2];
-            console.log("Spiceflow: Fetching data for", id);
-            const data = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/playlists/${id}`);
+            const data = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/playlists/${id}?fields=tracks.items(track(name))`);
             
-            if (data.error || !data.name) {
-                console.error("Spiceflow API Error:", data.error);
-                return { error: true, message: data.error?.message || "Gagal memuat data" };
-            }
+            if (data.error) return null; // Silent fail if rate limited
 
-            const result = {
-                image: data.images?.[0]?.url,
-                name: data.name,
-                owner: data.owner?.display_name,
-                tracks: data.tracks?.items?.slice(0, 3).map(i => i.track?.name).filter(Boolean)
-            };
-            cache.set(uri, result);
-            return result;
+            const tracks = data.tracks?.items?.slice(0, 3).map(i => i.track?.name).filter(Boolean);
+            cache.set(uri, tracks);
+            return tracks;
         } catch (e) {
-            console.error("Spiceflow error fetching data:", e);
-            return { error: true, message: "Terjadi kesalahan koneksi" };
+            return null; // Silent fail
         }
     }
 
-    function findPlaylistId(element) {
-        // Coba 1: a[href]
-        const link = element.querySelector("a[href*='playlist']");
-        if (link) {
-            const href = link.getAttribute("href");
-            const parts = href.split(/[:/]/);
-            return parts[parts.length - 1].split('?')[0];
-        }
-
-        // Coba 2: React Props Traversal (Spicetify Hack)
+    function extractMetadata(element) {
+        let uri = null;
+        
+        // 1. React Props Traversal untuk mencari URI
         let foundId = null;
         function searchNode(node) {
             if (foundId) return;
@@ -77,83 +61,83 @@
             traverse(node[propKey]);
         }
 
-        // Cek elemen root
         searchNode(element);
-        if (foundId) return foundId;
+        if (!foundId) {
+            const children = element.querySelectorAll("*");
+            for (let i = 0; i < children.length; i++) {
+                if (foundId) break;
+                searchNode(children[i]);
+            }
+        }
+        
+        if (foundId) uri = `spotify:playlist:${foundId}`;
 
-        // Cek semua children (terkadang props ada di elemen div bagian dalam)
-        const children = element.querySelectorAll("*");
-        for (let i = 0; i < children.length; i++) {
-            if (foundId) break;
-            searchNode(children[i]);
+        // 2. DOM Scraping untuk visual seketika (Instant Render)
+        const img = element.querySelector("img");
+        const image = img ? img.src : "";
+        
+        const lines = element.innerText.split('\n').map(s => s.trim()).filter(Boolean);
+        let name = lines[0] || "Unknown Playlist";
+        let owner = "Spotify";
+        
+        // Contoh teks: "Playlist • Hamin"
+        const subtitle = lines.find(l => l.includes("•"));
+        if (subtitle) {
+            owner = subtitle.split("•")[1].trim();
         }
 
-        return foundId;
+        return { uri, name, owner, image };
     }
-
-    let hoverTimeout = null;
 
     document.addEventListener("mouseover", async (e) => {
         const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
-        
         if (!item) return;
 
-        const id = findPlaylistId(item);
-        if (!id) return;
+        const metadata = extractMetadata(item);
+        if (!metadata.uri) return;
 
-        const uri = `spotify:playlist:${id}`;
-        
-        if (currentHover === uri) return;
+        if (currentHover === metadata.uri) return;
 
-        currentHover = uri;
+        currentHover = metadata.uri;
         if (hoverTimeout) clearTimeout(hoverTimeout);
-        tooltip.classList.remove("visible");
         
-        hoverTimeout = setTimeout(async () => {
-            if (currentHover !== uri) return;
-
-            console.log("Spiceflow: Fetching for URI:", uri);
-            const rect = item.getBoundingClientRect();
-            
-            tooltip.innerHTML = `<div class="spiceflow-loading">Loading preview...</div>`;
-            tooltip.style.top = `${rect.top}px`;
-            tooltip.style.left = `${rect.right + 15}px`;
-            tooltip.classList.add("visible");
-
-            const data = await fetchPlaylistData(uri);
-            
-            if (currentHover !== uri || !data) {
-                if (currentHover !== uri) tooltip.classList.remove("visible");
-                return;
-            }
-
-            if (data.error) {
-                tooltip.innerHTML = `
-                    <div class="spiceflow-tooltip-content">
-                        <div class="spiceflow-info">
-                            <div class="spiceflow-title" style="color: #ff5555;">Gagal Memuat</div>
-                            <div class="spiceflow-owner">Server menolak (Mungkin Rate Limit). Tunggu beberapa menit.</div>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            let tracksHtml = data.tracks && data.tracks.length > 0 
-                ? `<div class="spiceflow-tracks">` + data.tracks.map((t, i) => `<span>${i+1}. ${t}</span>`).join("") + `</div>`
-                : "";
-
-            tooltip.innerHTML = `
-                <div class="spiceflow-tooltip-content">
-                    ${data.image ? `<img src="${data.image}" class="spiceflow-cover" />` : ''}
-                    <div class="spiceflow-info">
-                        <div class="spiceflow-title">${data.name}</div>
-                        <div class="spiceflow-owner">Playlist • ${data.owner || 'Spotify'}</div>
-                        ${tracksHtml}
+        const rect = item.getBoundingClientRect();
+        tooltip.style.top = `${rect.top}px`;
+        tooltip.style.left = `${rect.right + 15}px`;
+        
+        // INSTANT RENDER (0 detik)
+        tooltip.innerHTML = `
+            <div class="spiceflow-tooltip-content">
+                ${metadata.image ? `<img src="${metadata.image}" class="spiceflow-cover" />` : ''}
+                <div class="spiceflow-info">
+                    <div class="spiceflow-title">${metadata.name}</div>
+                    <div class="spiceflow-owner">Playlist • ${metadata.owner}</div>
+                    <div class="spiceflow-tracks" id="spiceflow-tracks-container">
+                        <span style="opacity: 0.5; font-size: 11px;">Mencari lagu...</span>
                     </div>
                 </div>
-            `;
-        }, 500); // Tunggu 500ms sebelum fetch data
+            </div>
+        `;
+        tooltip.classList.add("visible");
+
+        // BACKGROUND FETCH DENGAN DEBOUNCE (Mencegah Rate Limit)
+        hoverTimeout = setTimeout(async () => {
+            if (currentHover !== metadata.uri) return;
+
+            const tracks = await fetchPlaylistTracks(metadata.uri);
+            
+            if (currentHover !== metadata.uri) return;
+
+            const tracksContainer = document.getElementById("spiceflow-tracks-container");
+            if (tracksContainer) {
+                if (tracks && tracks.length > 0) {
+                    tracksContainer.innerHTML = tracks.map((t, i) => `<span>${i+1}. ${t}</span>`).join("");
+                } else {
+                    // Silent fail (hilangkan teks loading, biarkan tooltip tetap cantik tanpa lagu)
+                    tracksContainer.innerHTML = "";
+                }
+            }
+        }, 500); 
     });
 
     document.addEventListener("mouseout", (e) => {
