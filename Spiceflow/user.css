@@ -18,76 +18,101 @@
   position: fixed;
   z-index: 99999;
   background-color: var(--spice-card, #181818);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-  padding: 12px;
-  width: 280px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  width: 260px;
+  height: 260px; /* Foto full height/width sebagai background */
   pointer-events: none;
   opacity: 0;
-  transform: translateY(5px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  overflow: hidden;
+  /* Animasi super mulus ala Framer Motion */
+  transform: translateY(15px) scale(0.95);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #spiceflow-tooltip.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .spiceflow-tooltip-content {
-  display: flex;
-  gap: 12px;
-  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .spiceflow-cover {
-  width: 64px;
-  height: 64px;
-  border-radius: 4px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  flex-shrink: 0;
+  z-index: 1;
+}
+
+/* Efek Fading Hitam (Gradient) di bawah agar teks terbaca */
+.spiceflow-tooltip-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65%;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 40%, transparent 100%);
+  z-index: 2;
 }
 
 .spiceflow-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px;
+  z-index: 3;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  overflow: hidden;
+  gap: 2px;
 }
 
 .spiceflow-title {
-  font-weight: bold;
-  font-size: 14px;
-  color: var(--spice-text, #fff);
+  font-weight: 800;
+  font-size: 18px;
+  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
 
 .spiceflow-owner {
   font-size: 12px;
-  color: var(--spice-subtext, #a7a7a7);
+  color: #ccc;
+  font-weight: 500;
 }
 
 .spiceflow-tracks {
   display: flex;
   flex-direction: column;
-  margin-top: 4px;
+  margin-top: 6px;
   gap: 2px;
 }
 
 .spiceflow-tracks span {
   font-size: 11px;
-  color: var(--spice-subtext, #a7a7a7);
+  color: #bbb;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .spiceflow-loading {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
   font-size: 12px;
   color: var(--spice-subtext, #a7a7a7);
-  text-align: center;
-  padding: 8px;
+  z-index: 3;
 }
 
 /* Sembunyikan default tippy saat hover library jika dimungkinkan */
