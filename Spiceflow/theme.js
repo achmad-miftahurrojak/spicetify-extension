@@ -85,53 +85,65 @@
         return foundId;
     }
 
+    let hoverTimeout = null;
+
     document.addEventListener("mouseover", async (e) => {
         const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
         
-        if (!item) {
-            currentHover = null;
-            tooltip.classList.remove("visible");
-            return;
-        }
+        if (!item) return;
 
         const id = findPlaylistId(item);
-        
-        if (!id) {
-            console.log("Spiceflow: Hovered item tapi tidak ditemukan ID playlist di DOM/React Props", item);
-            return;
-        }
+        if (!id) return;
 
         const uri = `spotify:playlist:${id}`;
-        console.log("Spiceflow: Terdeteksi hover pada URI:", uri);
+        
+        if (currentHover === uri) return;
+
         currentHover = uri;
+        if (hoverTimeout) clearTimeout(hoverTimeout);
+        tooltip.classList.remove("visible");
         
-        const rect = item.getBoundingClientRect();
-        
-        tooltip.innerHTML = `<div class="spiceflow-loading">Loading preview...</div>`;
-        tooltip.style.top = `${rect.top}px`;
-        tooltip.style.left = `${rect.right + 15}px`;
-        tooltip.classList.add("visible");
+        hoverTimeout = setTimeout(async () => {
+            if (currentHover !== uri) return;
 
-        const data = await fetchPlaylistData(uri);
-        
-        if (currentHover !== uri || !data) {
-            if (currentHover !== uri) tooltip.classList.remove("visible");
-            return;
-        }
+            console.log("Spiceflow: Fetching for URI:", uri);
+            const rect = item.getBoundingClientRect();
+            
+            tooltip.innerHTML = `<div class="spiceflow-loading">Loading preview...</div>`;
+            tooltip.style.top = `${rect.top}px`;
+            tooltip.style.left = `${rect.right + 15}px`;
+            tooltip.classList.add("visible");
 
-        let tracksHtml = data.tracks && data.tracks.length > 0 
-            ? `<div class="spiceflow-tracks">` + data.tracks.map((t, i) => `<span>${i+1}. ${t}</span>`).join("") + `</div>`
-            : "";
+            const data = await fetchPlaylistData(uri);
+            
+            if (currentHover !== uri || !data) {
+                if (currentHover !== uri) tooltip.classList.remove("visible");
+                return;
+            }
 
-        tooltip.innerHTML = `
-            <div class="spiceflow-tooltip-content">
-                ${data.image ? `<img src="${data.image}" class="spiceflow-cover" />` : ''}
-                <div class="spiceflow-info">
-                    <div class="spiceflow-title">${data.name}</div>
-                    <div class="spiceflow-owner">Playlist • ${data.owner || 'Spotify'}</div>
-                    ${tracksHtml}
+            let tracksHtml = data.tracks && data.tracks.length > 0 
+                ? `<div class="spiceflow-tracks">` + data.tracks.map((t, i) => `<span>${i+1}. ${t}</span>`).join("") + `</div>`
+                : "";
+
+            tooltip.innerHTML = `
+                <div class="spiceflow-tooltip-content">
+                    ${data.image ? `<img src="${data.image}" class="spiceflow-cover" />` : ''}
+                    <div class="spiceflow-info">
+                        <div class="spiceflow-title">${data.name}</div>
+                        <div class="spiceflow-owner">Playlist • ${data.owner || 'Spotify'}</div>
+                        ${tracksHtml}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }, 500); // Tunggu 500ms sebelum fetch data
+    });
+
+    document.addEventListener("mouseout", (e) => {
+        const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
+        if (item && !item.contains(e.relatedTarget)) {
+            if (hoverTimeout) clearTimeout(hoverTimeout);
+            currentHover = null;
+            tooltip.classList.remove("visible");
+        }
     });
 })();
