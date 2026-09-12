@@ -8,6 +8,7 @@ cp theme.js ~/.config/spicetify/Themes/Spiceflow/
 
 echo "Mengatur tema ke Spiceflow..."
 spicetify config current_theme Spiceflow
+spicetify config inject_theme_js 1
 spicetify apply
 
 echo "Instalasi selesai! Nikmati Spotify baru kamu."
