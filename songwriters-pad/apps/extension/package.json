@@ -1,0 +1,23 @@
+{
+  "name": "@swp/extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo \"add eslint later\"",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@swp/core": "workspace:*",
+    "@swp/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@swp/config": "workspace:*",
+    "@types/react": "^18.3.0",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.5.0"
+  }
+}

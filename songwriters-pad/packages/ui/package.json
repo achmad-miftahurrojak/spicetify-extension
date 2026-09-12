@@ -1,0 +1,25 @@
+{
+  "name": "@swp/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo \"add eslint later\"",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@swp/config": "workspace:*",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.0"
+  },
+  "peerDependencies": {
+    "@swp/core": "workspace:*"
+  },
+  "dependencies": {
+    "html-to-image": "^1.11.13"
+  }
+}

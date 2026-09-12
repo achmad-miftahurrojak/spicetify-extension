@@ -1,0 +1,2 @@
+
+declare const Spicetify: any;

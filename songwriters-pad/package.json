@@ -1,0 +1,20 @@
+{
+  "name": "songwriters-pad",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Timestamped creative notes inside Spotify. Spicetify extension.",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "clean": "turbo clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.1.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "@swp/config/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src", "../../packages/core/src", "../../packages/ui/src"]
+}
