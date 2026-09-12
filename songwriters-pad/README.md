@@ -1,101 +1,115 @@
 # Songwriter's Pad
 
-Timestamped creative notes inside Spotify. Capture lyric, melody, chord, and vibe ideas pinned to the exact second of a track. Built as a Spicetify extension.
+Timestamped creative notes inside Spotify. Capture lyrics, melodies, chords, and memories pinned to the exact second of a track.
 
-## Monorepo Structure
+![Build Status](https://img.shields.io/github/actions/workflow/status/achmad-miftahurrojak/achmad-miftahurrojak/release.yml?branch=main)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-```
-apps/extension     Entrypoint, builds into a single JS file loaded by Spicetify
-packages/core      Pure logic: schema, storage, player wrapper, export/backup
-packages/ui        React components (NotePanel, NoteCard, QuickAddBar, TagChip)
-packages/config    Shared tsconfig + eslint
-```
+## Table of Contents
 
-`packages/core` and `packages/ui` never import each other. Only `apps/extension` wires them together. All Spicetify API calls live in `packages/core/player.ts` and `packages/core/storage.ts`, so a Spicetify breaking change only touches two files.
+* [Features](#features)
+* [Screenshots](#screenshots)
+* [Installation](#installation)
+* [Usage](#usage)
+* [Monorepo Structure](#monorepo-structure)
+* [API Reference](#api-reference)
+* [Contributing](#contributing)
+* [License](#license)
+* [Acknowledgments](#acknowledgments)
 
-## Prerequisites
+## Features
 
-- Node 20+, pnpm 9+
-- Spicetify CLI v2.36+
-- Spotify desktop app
+* **Timestamped Notes**: Pin your ideas to specific moments in a song.
+* **Dual Modes**: Switch between Creator mode for songwriting (lyrics, chords, melodies) and Memory mode for personal moments.
+* **Export to Image**: Render and export your memories as beautifully designed images to share on social media.
+* **Cross-Song Filtering**: View notes by tags or by the person associated with them across different tracks.
+* **Ad Blocker Logic**: Automatically hides the UI components during advertisements.
+* **Local Storage**: All data is stored locally via the Spicetify API for privacy and speed.
 
-## Setup
+## Screenshots
+
+*(Insert preview image or GIF here)*
+
+## Installation
+
+### Prerequisites
+
+* Node.js 20 or higher
+* pnpm 9 or higher
+* Spicetify CLI v2.36 or higher
+* Spotify Desktop Application
+
+### Getting Started
 
 ```bash
+git clone https://github.com/achmad-miftahurrojak/achmad-miftahurrojak.git
+cd songwriters-pad
 pnpm install
-```
-
-## Build
-
-```bash
 pnpm build
 ```
 
-Output: `apps/extension/dist/songwriters-pad.js`
-
-## Install (Spicetify Marketplace)
+### Install via Spicetify Marketplace
 
 Once approved in the marketplace:
-1. Open Spicetify Marketplace in Spotify.
+1. Open Spicetify Marketplace within Spotify.
 2. Search for "Songwriter's Pad".
 3. Click Install.
 
-## Install (Manual / Local Dev)
+### Manual Installation
 
-Spicetify loads local extensions from its own Extensions folder by FILE NAME.
-Absolute paths do NOT work (they are injected as script URLs and fail with
-net::ERR_NAME_NOT_RESOLVED).
+Spicetify loads local extensions from its internal Extensions directory by file name. Absolute paths are not supported.
 
 ```bash
-# find the spicetify folder (usually C:\Users\<you>\.spicetify)
+# Locate your Spicetify directory
 spicetify config-dir
 
-# copy the built file into the Extensions folder inside it
-cp apps/extension/dist/songwriters-pad.js "<spicetify folder>/Extensions/"
+# Copy the built file into the Extensions directory
+cp apps/extension/dist/songwriters-pad.js "<spicetify-directory>/Extensions/"
 
-# register by file NAME only
+# Register the extension by file name
 spicetify config extensions songwriters-pad.js
 spicetify apply
 ```
 
-Restart Spotify. A pen icon appears in the top bar. Shortcut: `Ctrl+Shift+.`.
+Restart Spotify to apply the changes.
 
-Optional: set SPICETIFY_EXTENSIONS to your Extensions folder path to auto-copy
-on every build (see build.mjs header).
+## Usage
 
-## Dev mode (watch rebuild)
+A pen icon will appear in the top bar of the Spotify interface. You can also use the keyboard shortcut `Ctrl+Shift+.` to toggle the focus.
 
-```bash
-pnpm dev
-```
+To create a note, play a track, select your desired mode (Creator or Memory), and start typing. The note will be pinned to the current playback timestamp.
 
-esbuild watches and rebuilds `dist/songwriters-pad.js`. After each rebuild, restart Spotify or run `spicetify apply` again to reload the extension.
+## Monorepo Structure
 
-## Uninstall
+* `apps/extension`: The entrypoint that builds into a single JavaScript file loaded by Spicetify.
+* `packages/core`: Contains pure logic including schema definitions, storage utilities, player wrappers, and export logic.
+* `packages/ui`: Contains React components such as NotePanel, NoteCard, QuickAddBar, and TagChip.
+* `packages/config`: Contains shared configurations for TypeScript and ESLint.
 
-```bash
-spicetify config extensions songwriters-pad.js --
-spicetify apply
-```
+`packages/core` and `packages/ui` are strictly separated. Only `apps/extension` connects them. All Spicetify API interactions are isolated in `packages/core/player.ts` and `packages/core/storage.ts`.
 
-Then delete `songwriters-pad.js` from the Spicetify Extensions folder.
+## API Reference
 
-## Update
+The extension relies on internal Spicetify APIs. For full documentation regarding Spicetify extension development, refer to the [Spicetify Documentation](https://spicetify.app/docs/development/extension).
 
-1. Backup your notes first: open the panel, Export, then Backup All (JSON).
-2. `git pull`, `pnpm install`, `pnpm build`.
-3. `spicetify apply`.
+## Contributing
 
-## Publish to Spicetify Marketplace
+1. Create a backup of your notes via the extension panel.
+2. Pull the latest changes.
+3. Run `pnpm install` and `pnpm build`.
+4. Apply the changes with `spicetify apply`.
 
-1. Record a 30-60 second `preview.gif` or capture a `preview.png` showing the extension in action (adding a note, seeking, editing). Save it to the root of the repository.
-2. Tag a release on GitHub. The `.github/workflows/release.yml` action will automatically build and commit the `dist` output.
-3. Open a PR to `spicetify/marketplace` adding this repository's `manifest.json` to their extensions manifest list.
-
-## Disclaimer
-
-Spicetify modifies the Spotify client, which violates Spotify's ToS. Use at your own risk. Spotify updates can break Spicetify; this is outside our control.
+To publish a new version to the Spicetify Marketplace:
+1. Save a `preview.gif` or `preview.png` in the repository root demonstrating the functionality.
+2. Tag a release on GitHub. The automated workflow will handle the build process.
+3. Open a pull request to the `spicetify/marketplace` repository to add the `manifest.json`.
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
+
+Disclaimer: Spicetify modifies the Spotify client, which violates the Spotify Terms of Service. Use at your own risk. Spotify client updates may temporarily break functionality.
+
+## Acknowledgments
+
+Built by Hamin. Thanks to the Spicetify community for the tools and inspiration.
