@@ -1,35 +1,11 @@
-(async function Spiceflow() {
+(function Spiceflow() {
     console.log("Spiceflow: Script injected and running!");
 
-    while (!Spicetify?.CosmosAsync || !Spicetify?.Platform) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    console.log("Spiceflow: Spicetify API ready!");
-
-    const cache = new Map();
     let currentHover = null;
-    let hoverTimeout = null;
 
     const tooltip = document.createElement("div");
     tooltip.id = "spiceflow-tooltip";
     document.body.appendChild(tooltip);
-
-    async function fetchPlaylistTracks(uri) {
-        if (cache.has(uri)) return cache.get(uri);
-        try {
-            const id = uri.split(":")[2];
-            const data = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/playlists/${id}?fields=tracks.items(track(name))`);
-            
-            if (data.error) return null; // Silent fail if rate limited
-
-            const tracks = data.tracks?.items?.slice(0, 3).map(i => i.track?.name).filter(Boolean);
-            cache.set(uri, tracks);
-            return tracks;
-        } catch (e) {
-            return null; // Silent fail
-        }
-    }
 
     function extractMetadata(element) {
         let uri = null;
@@ -89,7 +65,7 @@
         return { uri, name, owner, image };
     }
 
-    document.addEventListener("mouseover", async (e) => {
+    document.addEventListener("mouseover", (e) => {
         const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
         if (!item) return;
 
@@ -99,7 +75,6 @@
         if (currentHover === metadata.uri) return;
 
         currentHover = metadata.uri;
-        if (hoverTimeout) clearTimeout(hoverTimeout);
         
         const rect = item.getBoundingClientRect();
         const tooltipHeight = 190; // Ukuran card di CSS
@@ -118,45 +93,22 @@
         tooltip.style.top = `${topPos}px`;
         tooltip.style.left = `${rect.right + 15}px`;
         
-        // INSTANT RENDER (0 detik)
+        // INSTANT RENDER (0 detik) - Hapus bagian list track
         tooltip.innerHTML = `
             <div class="spiceflow-tooltip-content">
                 ${metadata.image ? `<img src="${metadata.image}" class="spiceflow-cover" />` : ''}
                 <div class="spiceflow-info">
                     <div class="spiceflow-title">${metadata.name}</div>
                     <div class="spiceflow-owner">Playlist • ${metadata.owner}</div>
-                    <div class="spiceflow-tracks" id="spiceflow-tracks-container">
-                        <span style="opacity: 0.5; font-size: 11px;">Mencari lagu...</span>
-                    </div>
                 </div>
             </div>
         `;
         tooltip.classList.add("visible");
-
-        // BACKGROUND FETCH DENGAN DEBOUNCE (Mencegah Rate Limit)
-        hoverTimeout = setTimeout(async () => {
-            if (currentHover !== metadata.uri) return;
-
-            const tracks = await fetchPlaylistTracks(metadata.uri);
-            
-            if (currentHover !== metadata.uri) return;
-
-            const tracksContainer = document.getElementById("spiceflow-tracks-container");
-            if (tracksContainer) {
-                if (tracks && tracks.length > 0) {
-                    tracksContainer.innerHTML = tracks.map((t, i) => `<span>${i+1}. ${t}</span>`).join("");
-                } else {
-                    // Silent fail (hilangkan teks loading, biarkan tooltip tetap cantik tanpa lagu)
-                    tracksContainer.innerHTML = "";
-                }
-            }
-        }, 500); 
     });
 
     document.addEventListener("mouseout", (e) => {
         const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
         if (item && !item.contains(e.relatedTarget)) {
-            if (hoverTimeout) clearTimeout(hoverTimeout);
             currentHover = null;
             tooltip.classList.remove("visible");
         }
