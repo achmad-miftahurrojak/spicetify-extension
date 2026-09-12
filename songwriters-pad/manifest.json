@@ -1,0 +1,10 @@
+{
+  "name": "Songwriter's Pad",
+  "description": "Capture timestamped creative notes pinned to the exact second of any track",
+  "preview": "preview.png",
+  "readme": "README.md",
+  "branch": "main",
+  "src": "apps/extension/dist/songwriters-pad.js",
+  "authors": [{ "name": "Achmad Miftahurrojak", "github": "hamin-baek" }],
+  "tags": ["notes", "productivity"]
+}
