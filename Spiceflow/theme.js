@@ -102,7 +102,20 @@
         if (hoverTimeout) clearTimeout(hoverTimeout);
         
         const rect = item.getBoundingClientRect();
-        tooltip.style.top = `${rect.top}px`;
+        const tooltipHeight = 190; // Ukuran card di CSS
+        
+        // Coba posisikan sejajar tengah dengan item
+        let topPos = rect.top + (rect.height / 2) - (tooltipHeight / 2);
+        
+        // Cegah keluar layar atas
+        if (topPos < 20) topPos = 20;
+        
+        // Cegah keluar layar bawah (terpotong)
+        if (topPos + tooltipHeight > window.innerHeight - 20) {
+            topPos = window.innerHeight - tooltipHeight - 20;
+        }
+
+        tooltip.style.top = `${topPos}px`;
         tooltip.style.left = `${rect.right + 15}px`;
         
         // INSTANT RENDER (0 detik)
