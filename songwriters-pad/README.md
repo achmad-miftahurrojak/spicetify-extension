@@ -1,6 +1,6 @@
 # Songwriter's Pad
 
-Timestamped creative notes inside Spotify. Capture lyrics, melodies, chords, and memories pinned to the exact second of a track.
+A Spicetify extension designed to capture timestamped lyrics, melodies, chords, and memories directly within the Spotify interface.
 
 ![Build Status](https://img.shields.io/github/actions/workflow/status/achmad-miftahurrojak/achmad-miftahurrojak/release.yml?branch=main)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
@@ -19,16 +19,19 @@ Timestamped creative notes inside Spotify. Capture lyrics, melodies, chords, and
 
 ## Features
 
-* **Timestamped Notes**: Pin your ideas to specific moments in a song.
-* **Dual Modes**: Switch between Creator mode for songwriting (lyrics, chords, melodies) and Memory mode for personal moments.
-* **Export to Image**: Render and export your memories as beautifully designed images to share on social media.
-* **Cross-Song Filtering**: View notes by tags or by the person associated with them across different tracks.
-* **Ad Blocker Logic**: Automatically hides the UI components during advertisements.
-* **Local Storage**: All data is stored locally via the Spicetify API for privacy and speed.
+* **Timestamped Notes**: Attach ideas to specific moments in a playback track.
+* **Dual Modes**: Alternate between Creator mode for songwriting purposes (lyrics, chords, melodies) and Memory mode for personal moments.
+* **Export to Image**: Render and export notes as high quality images for social media sharing.
+* **Cross-Song Filtering**: View and filter notes by tags or associated individuals across multiple tracks.
+* **Ad Blocker Logic**: Automatically hides the user interface components during advertisements.
+* **Local Storage**: Data is stored locally via the Spicetify API to ensure privacy and optimal performance.
 
 ## Screenshots
 
-*(Insert preview image or GIF here)*
+<p align="center">
+  <img src="../preview.png" width="48%" />
+  <img src="../preview2.png" width="48%" />
+</p>
 
 ## Installation
 
@@ -42,15 +45,15 @@ Timestamped creative notes inside Spotify. Capture lyrics, melodies, chords, and
 ### Getting Started
 
 ```bash
-git clone https://github.com/achmad-miftahurrojak/achmad-miftahurrojak.git
-cd songwriters-pad
+git clone https://github.com/achmad-miftahurrojak/spicetify-extension.git
+cd spicetify-extension/songwriters-pad
 pnpm install
 pnpm build
 ```
 
 ### Install via Spicetify Marketplace
 
-Once approved in the marketplace:
+Once the extension is approved in the marketplace:
 1. Open Spicetify Marketplace within Spotify.
 2. Search for "Songwriter's Pad".
 3. Click Install.
@@ -77,7 +80,7 @@ Restart Spotify to apply the changes.
 
 A pen icon will appear in the top bar of the Spotify interface. You can also use the keyboard shortcut `Ctrl+Shift+.` to toggle the focus.
 
-To create a note, play a track, select your desired mode (Creator or Memory), and start typing. The note will be pinned to the current playback timestamp.
+To create a note, play a track, select your desired mode (Creator or Memory), and begin typing. The note will be pinned to the current playback timestamp.
 
 ## Monorepo Structure
 
@@ -86,7 +89,7 @@ To create a note, play a track, select your desired mode (Creator or Memory), an
 * `packages/ui`: Contains React components such as NotePanel, NoteCard, QuickAddBar, and TagChip.
 * `packages/config`: Contains shared configurations for TypeScript and ESLint.
 
-`packages/core` and `packages/ui` are strictly separated. Only `apps/extension` connects them. All Spicetify API interactions are isolated in `packages/core/player.ts` and `packages/core/storage.ts`.
+The `packages/core` and `packages/ui` directories are strictly separated. Only `apps/extension` connects them. All Spicetify API interactions are isolated in `packages/core/player.ts` and `packages/core/storage.ts`.
 
 ## API Reference
 
