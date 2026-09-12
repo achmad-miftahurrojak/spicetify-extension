@@ -28,7 +28,8 @@ A Spicetify extension designed to capture timestamped lyrics, melodies, chords, 
 
 ## Screenshots
 
-![Preview](preview.png)
+![Preview 1](preview.png)
+![Preview 2](preview2.png)
 
 ## Installation
 
