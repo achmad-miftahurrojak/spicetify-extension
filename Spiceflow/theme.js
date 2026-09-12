@@ -39,10 +39,16 @@
             return;
         }
 
-        const link = item.querySelector('a[href^="/playlist/"]');
+        // Cari semua anchor tag di dalam item
+        const link = item.querySelector("a[href]");
         if (!link) return;
 
-        const urlParts = link.getAttribute("href").split("/");
+        const href = link.getAttribute("href");
+        // Pastikan ini adalah playlist
+        if (!href.includes("playlist")) return;
+
+        // Extract ID dari href (contoh href: /playlist/37i9dQZF1DXcBWIGoYBM5M atau spotify:playlist:xxx)
+        const urlParts = href.split(/[:/]/);
         const id = urlParts[urlParts.length - 1];
         const uri = `spotify:playlist:${id}`;
 
@@ -56,8 +62,8 @@
 
         const data = await fetchPlaylistData(uri);
         
-        // Cek jika mouse masih di item yang sama
         if (currentHover !== uri || !data) {
+            if (currentHover !== uri) tooltip.classList.remove("visible");
             return;
         }
 
