@@ -11,6 +11,7 @@ copy /Y "%~dp0theme.js" "%appdata%\spicetify\Themes\Spiceflow\" >nul
 
 echo Mengatur tema ke Spiceflow...
 spicetify config current_theme Spiceflow
+spicetify config inject_theme_js 1
 spicetify apply
 
 echo Instalasi selesai! Nikmati Spotify baru kamu.
