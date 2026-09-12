@@ -21,6 +21,12 @@
             const id = uri.split(":")[2];
             console.log("Spiceflow: Fetching data for", id);
             const data = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/playlists/${id}`);
+            
+            if (data.error || !data.name) {
+                console.error("Spiceflow API Error:", data.error);
+                return { error: true, message: data.error?.message || "Gagal memuat data" };
+            }
+
             const result = {
                 image: data.images?.[0]?.url,
                 name: data.name,
@@ -31,7 +37,7 @@
             return result;
         } catch (e) {
             console.error("Spiceflow error fetching data:", e);
-            return null;
+            return { error: true, message: "Terjadi kesalahan koneksi" };
         }
     }
 
@@ -118,6 +124,18 @@
             
             if (currentHover !== uri || !data) {
                 if (currentHover !== uri) tooltip.classList.remove("visible");
+                return;
+            }
+
+            if (data.error) {
+                tooltip.innerHTML = `
+                    <div class="spiceflow-tooltip-content">
+                        <div class="spiceflow-info">
+                            <div class="spiceflow-title" style="color: #ff5555;">Gagal Memuat</div>
+                            <div class="spiceflow-owner">Server menolak (Mungkin Rate Limit). Tunggu beberapa menit.</div>
+                        </div>
+                    </div>
+                `;
                 return;
             }
 
