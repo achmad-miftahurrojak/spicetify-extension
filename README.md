@@ -2,6 +2,8 @@
 
 A collection of custom extensions for Spicetify, enhancing the Spotify desktop client experience with additional features and functionalities.
 
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+
 ## Repository Structure
 
 This repository is organized as a monorepo containing multiple independent Spicetify extensions. Each extension resides in its own directory with dedicated documentation.
