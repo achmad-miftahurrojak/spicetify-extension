@@ -241,8 +241,114 @@
         }
     }
 
+    // ── macOS Dock Magnification Engine ─────────────────────────────────────
+    const DOCK_MAX_SCALE   = 1.45;
+    const DOCK_MIN_SCALE   = 1.0;
+    const DOCK_EFFECT_HALF = 80; // px radius of magnification influence (vertical)
+    const DOCK_LERP        = 0.18;
+
+    let dockMouseY    = null; // cursor Y relative to the sidebar list container
+    let dockItems     = [];   // { el, baseH, currentScale }
+    let dockRafId     = null;
+    let dockContainer = null;
+
+    function getDockItems() {
+        const selector = ".main-yourLibraryX-listItem, .main-rootlist-rootlistItem";
+        const els = document.querySelectorAll(selector);
+        if (els.length === 0) return;
+
+        dockItems = Array.from(els).map(el => {
+            const baseH = el.getBoundingClientRect().height || 56;
+            return { el, baseH, currentScale: DOCK_MIN_SCALE };
+        });
+    }
+
+    function calcTargetScales() {
+        if (dockMouseY === null) return dockItems.map(() => DOCK_MIN_SCALE);
+
+        return dockItems.map(({ el }) => {
+            const rect = el.getBoundingClientRect();
+            const center = rect.top + rect.height / 2;
+            const dist = Math.abs(center - dockMouseY);
+
+            if (dist > DOCK_EFFECT_HALF) return DOCK_MIN_SCALE;
+
+            const theta = (dist / DOCK_EFFECT_HALF) * Math.PI;
+            const factor = (1 + Math.cos(theta)) / 2;
+            return DOCK_MIN_SCALE + factor * (DOCK_MAX_SCALE - DOCK_MIN_SCALE);
+        });
+    }
+
+    function dockTick() {
+        const targets = calcTargetScales();
+        let needMore = dockMouseY !== null;
+
+        dockItems.forEach((item, i) => {
+            const diff = targets[i] - item.currentScale;
+            if (Math.abs(diff) > 0.003) {
+                item.currentScale += diff * DOCK_LERP;
+                needMore = true;
+            } else {
+                item.currentScale = targets[i];
+            }
+
+            const s = item.currentScale;
+            item.el.style.transform       = `scaleY(${s})`;
+            item.el.style.transformOrigin = 'center center';
+            item.el.style.zIndex          = Math.round(s * 10).toString();
+        });
+
+        if (needMore) {
+            dockRafId = requestAnimationFrame(dockTick);
+        } else {
+            dockRafId = null;
+        }
+    }
+
+    function startDockRaf() {
+        if (!dockRafId) dockRafId = requestAnimationFrame(dockTick);
+    }
+
+    function setupDockMagnification() {
+        getDockItems();
+
+        document.addEventListener("mousemove", (e) => {
+            const sel = ".main-yourLibraryX-listItem, .main-rootlist-rootlistItem";
+            const hoveredItem = e.target.closest(sel);
+            if (hoveredItem) {
+                dockMouseY = e.clientY;
+                // Re-sync items lazily in case sidebar changed
+                if (dockItems.length === 0) getDockItems();
+                startDockRaf();
+            }
+        });
+
+        document.addEventListener("mouseleave", () => {
+            dockMouseY = null;
+            startDockRaf();
+        }, true);
+
+        // Reset when mouse leaves any sidebar item area
+        document.addEventListener("mouseover", (e) => {
+            const sel = ".main-yourLibraryX-listItem, .main-rootlist-rootlistItem";
+            if (!e.target.closest(sel)) {
+                dockMouseY = null;
+                startDockRaf();
+            }
+        });
+
+        // Re-index items when sidebar content mutates
+        const observer = new MutationObserver(() => {
+            getDockItems();
+        });
+        const sidebar = document.querySelector(".main-yourLibraryX-listContainer, [data-testid='rootlist-container']");
+        if (sidebar) observer.observe(sidebar, { childList: true, subtree: true });
+    }
+
     function setupListeners() {
         let currentItemNode = null;
+
+        setupDockMagnification();
 
         document.addEventListener("mouseover", (e) => {
             const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
@@ -263,15 +369,18 @@
             clearTimeout(fetchTimer);
 
             const rect = item.getBoundingClientRect();
-            const cardH = 420; // Fixed max height
+            const cardH = 420;
             
-            // "patenkan berada di tengah app tapi tetap disebelah sidebar ... pas tengah dan rata kiri"
             const topPos = (window.innerHeight / 2) - (cardH / 2);
             
             tooltip.style.top = `${topPos}px`;
             tooltip.style.left = `${rect.right + 12}px`;
             tooltip.innerHTML = renderBase(metadata);
             tooltip.classList.add("visible");
+            tooltip.animate(
+                [{ opacity: 0, transform: "scale(0.97)" }, { opacity: 1, transform: "scale(1)" }],
+                { duration: 200, easing: "ease-out" }
+            );
 
             const playlistId = metadata.uri.split(':').pop();
             const capturedUri = metadata.uri;
@@ -285,7 +394,7 @@
                 clearTimeout(hideTimer);
                 hideTimer = setTimeout(() => {
                     closeModal();
-                }, 600); // Increased to 600ms to allow mouse to travel to centered modal
+                }, 600);
             }
         });
     }
