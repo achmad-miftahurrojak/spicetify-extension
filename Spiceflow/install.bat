@@ -1,15 +1,8 @@
 @echo off
-echo Menginstal Spiceflow Theme...
-
-:: Buat folder jika belum ada
 if not exist "%appdata%\spicetify\Themes\Spiceflow" mkdir "%appdata%\spicetify\Themes\Spiceflow"
-
-:: Copy file ke folder theme spicetify
-copy /Y "%~dp0color.ini" "%appdata%\spicetify\Themes\Spiceflow\" >nul
-copy /Y "%~dp0user.css" "%appdata%\spicetify\Themes\Spiceflow\" >nul
-copy /Y "%~dp0theme.js" "%appdata%\spicetify\Themes\Spiceflow\" >nul
-
-echo Mengatur tema ke Spiceflow...
+xcopy /Y /I "%~dp0color.ini" "%appdata%\spicetify\Themes\Spiceflow\" >nul
+xcopy /Y /I "%~dp0user.css" "%appdata%\spicetify\Themes\Spiceflow\" >nul
+xcopy /Y /I "%~dp0theme.js" "%appdata%\spicetify\Themes\Spiceflow\" >nul
 spicetify config current_theme Spiceflow
 spicetify config inject_theme_js 1
 spicetify apply
