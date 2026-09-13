@@ -26,10 +26,8 @@ function showPostcardModal(msg: any, meta: any, onDelete?: () => void) {
                 <div style={{ display: 'flex', gap: '16px', width: '100%', marginTop: '8px' }}>
                     <button 
                         onClick={() => {
-                            if (confirm("Hapus dedication ini?")) {
-                                Spicetify.PopupModal.hide();
-                                onDelete?.();
-                            }
+                            Spicetify.PopupModal.hide();
+                            onDelete?.();
                         }}
                         style={{
                             flex: 1,
@@ -447,9 +445,7 @@ function App() {
                                                 className="dedication-delete-btn"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    if (confirm("Hapus dedication ini?")) {
-                                                        deleteDedication(msg.id);
-                                                    }
+                                                    deleteDedication(msg.id);
                                                 }}
                                                 style={{
                                                     position: 'absolute', top: '-8px', right: '-8px', padding: '6px',
