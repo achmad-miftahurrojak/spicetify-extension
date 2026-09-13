@@ -91,10 +91,22 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
             return;
         }
 
+        let senderAvatar = "";
+        let finalFromName = fromName;
+        try {
+            const userApi = Spicetify.Platform?.UserAPI;
+            const user = userApi?.getUser ? await userApi.getUser() : (userApi?._state || null);
+            if (user) {
+                senderAvatar = user.images?.[0]?.url || user.avatar_url || user.profile_image || user.picture || "";
+                if (!finalFromName) finalFromName = user.displayName || user.name || user.username || "";
+            }
+        } catch(e) {}
+
         const success = await transport.sendDedication(targetCode, {
             trackUri,
             message,
-            fromName: fromName || 'Anonymous',
+            fromName: finalFromName || 'Anonymous',
+            senderAvatar,
             timestamp: Date.now(),
             ...meta
         });

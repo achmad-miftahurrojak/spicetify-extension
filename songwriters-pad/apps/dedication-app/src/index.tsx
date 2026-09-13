@@ -418,8 +418,8 @@ function App() {
 
                                             {/* Meta & Status: Sender Identity */}
                                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0, gap: '4px', minWidth: '64px' }}>
-                                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--spice-highlight-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', color: 'var(--spice-text)' }}>
-                                                    {senderInitial}
+                                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--spice-highlight-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', color: 'var(--spice-text)', overflow: 'hidden' }}>
+                                                    {msg.senderAvatar ? <img src={msg.senderAvatar} style={{width:'100%', height:'100%', objectFit:'cover'}} /> : senderInitial}
                                                 </div>
                                                 <div style={{ fontSize: '13px', fontWeight: '500', color: 'var(--spice-text)', textTransform: 'capitalize' }}>
                                                     {senderName}
