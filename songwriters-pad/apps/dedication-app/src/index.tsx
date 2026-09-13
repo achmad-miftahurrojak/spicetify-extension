@@ -1,43 +1,100 @@
 import { DedicationPayload } from '@dedication/transport';
 
-// 5. Full Postcard Modal
-function showPostcardModal(msg: any, meta: any, onDelete?: () => void) {
-    const coverUrl = meta?.album?.images?.[0]?.url;
-    const trackName = meta?.name || (meta?.loading ? "Loading..." : "Unknown Track");
-    const artistName = meta?.artists?.[0]?.name || "";
+// Shared Helper
+const getDaysAgo = (timestamp?: number) => {
+    if (!timestamp) return 'recently';
+    const days = Math.floor((Date.now() - timestamp) / (1000 * 60 * 60 * 24));
+    if (days === 0) return 'today';
+    if (days === 1) return 'yesterday';
+    return `${days} days ago`;
+};
 
-    Spicetify.PopupModal.display({
-        title: "A Dedication For You",
-        content: (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', textAlign: 'center' }}>
-                <div style={{ width: '200px', height: '200px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
-                    {coverUrl ? <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{width:'100%', height:'100%', background:'var(--spice-main)'}}/>}
+function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any) {
+    const [deleteStep, setDeleteStep] = Spicetify.React.useState(0);
+    const senderName = msg.fromName && msg.fromName.toLowerCase() !== 'anonymous' ? msg.fromName : "Someone";
+    const senderInitial = senderName.charAt(0).toUpperCase();
+
+    // Reset delete step after 3s
+    Spicetify.React.useEffect(() => {
+        let t: any;
+        if (deleteStep === 1) {
+            t = setTimeout(() => setDeleteStep(0), 3000);
+        }
+        return () => clearTimeout(t);
+    }, [deleteStep]);
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', textAlign: 'center', padding: '0 8px' }}>
+            <div style={{fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--spice-subtext)'}}>
+                A DEDICATION
+            </div>
+            
+            <div style={{ position: 'relative', width: '224px', height: '224px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 32px rgba(0,0,0,0.5)', marginTop: '4px' }}>
+                {coverUrl ? <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{width:'100%', height:'100%', background:'var(--spice-main)'}}/>}
+                
+                {/* Playful Stamp */}
+                <div style={{
+                    position: 'absolute', top: '12px', right: '12px', width: '32px', height: '32px', 
+                    background: 'var(--spice-card)', opacity: 0.8, borderRadius: '6px', transform: 'rotate(5deg)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '16px', fontWeight: 'bold', color: 'var(--spice-text)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                }}>
+                    {senderInitial}
                 </div>
-                <div>
-                    <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 4px', color: 'var(--spice-text)' }}>{trackName}</h2>
-                    <span style={{ fontSize: '16px', color: 'var(--spice-subtext)' }}>{artistName}</span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '0', color: 'var(--spice-text)' }}>{trackName}</h2>
+                <span style={{ fontSize: '16px', color: 'var(--spice-subtext)' }}>{artistName}</span>
+            </div>
+
+            <div style={{ width: '100%', height: '1px', borderBottom: '1px dashed rgba(255,255,255,0.1)', margin: '8px 0' }} />
+
+            <div style={{ width: '100%', fontSize: '17px', fontWeight: 400, color: 'var(--spice-text)', lineHeight: '1.5', position: 'relative', padding: '0 16px' }}>
+                <span style={{ fontSize: '24px', color: 'var(--spice-button)', opacity: 0.5, marginRight: '4px' }}>“</span>
+                {msg.message}
+                <span style={{ fontSize: '24px', color: 'var(--spice-button)', opacity: 0.5, marginLeft: '4px' }}>”</span>
+            </div>
+
+            {/* Footer */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px', background: 'rgba(255,255,255,0.02)', padding: '8px 16px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--spice-highlight-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold', color: 'var(--spice-text)', overflow: 'hidden' }}>
+                    {msg.senderAvatar ? <img src={msg.senderAvatar} style={{width:'100%', height:'100%', objectFit:'cover'}} /> : senderInitial}
                 </div>
-                <div style={{ background: 'var(--spice-card)', padding: '24px', borderRadius: '12px', width: '100%', fontStyle: 'italic', fontSize: '16px', lineHeight: '1.5' }}>
-                    "{msg.message}"
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--spice-text)', textTransform: 'capitalize' }}>
+                        {senderName}
+                    </div>
                 </div>
-                <div style={{ color: 'var(--spice-subtext)', fontSize: '14px' }}>
-                    Sent by <strong style={{color:'var(--spice-text)'}}>{msg.fromName}</strong> on {new Date(msg.timestamp).toLocaleDateString()}
+                <div style={{ fontSize: '12px', color: 'var(--spice-subtext)', marginLeft: '8px' }}>
+                    • {getDaysAgo(msg.timestamp)}
                 </div>
-                <div style={{ display: 'flex', gap: '16px', width: '100%', marginTop: '8px' }}>
-                    <button 
-                        onClick={() => {
+            </div>
+
+            {/* Action Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginTop: '24px' }}>
+                {/* Delete */}
+                <button 
+                    onClick={() => {
+                        if (deleteStep === 0) {
+                            setDeleteStep(1);
+                        } else {
                             Spicetify.PopupModal.hide();
                             onDelete?.();
-                        }}
-                        style={{
-                            flex: 1,
-                            background: 'transparent', color: 'var(--spice-error, #e22134)',
-                            border: '1px solid var(--spice-error, #e22134)', padding: '14px 24px', borderRadius: '32px',
-                            fontSize: '16px', fontWeight: 'bold', cursor: 'pointer'
-                        }}
-                    >
-                        Delete
-                    </button>
+                        }
+                    }}
+                    style={{
+                        background: 'transparent', border: 'none', color: deleteStep === 1 ? 'var(--spice-error, #e22134)' : 'var(--spice-subtext)',
+                        fontSize: '13px', cursor: 'pointer', padding: '8px',
+                        transition: 'color 0.2s', fontWeight: deleteStep === 1 ? 'bold' : 'normal'
+                    }}
+                >
+                    {deleteStep === 0 ? "Delete" : "Sure? Click again"}
+                </button>
+
+                {/* Play & Queue */}
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <button 
                         onClick={() => {
                             try {
@@ -45,28 +102,63 @@ function showPostcardModal(msg: any, meta: any, onDelete?: () => void) {
                                     Spicetify.addToQueue([{ uri: msg.trackUri }]);
                                 } else if (Spicetify.Platform?.PlayerAPI?.addToQueue) {
                                     Spicetify.Platform.PlayerAPI.addToQueue([{ uri: msg.trackUri }]);
-                                } else {
-                                    Spicetify.Player.playUri(msg.trackUri);
                                 }
-                                try { Spicetify.showNotification?.(String("Accepted & added to queue!")); } catch {}
+                                try { Spicetify.showNotification?.(String("Added to queue!")); } catch {}
                             } catch (e) {
-                                Spicetify.Player.playUri(msg.trackUri);
-                                try { Spicetify.showNotification?.(String("Playing now...")); } catch {}
+                                // Fallback
                             }
+                        }}
+                        style={{
+                            background: 'transparent', color: 'var(--spice-subtext)',
+                            border: 'none', width: '40px', height: '40px', borderRadius: '50%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                            transition: 'color 0.15s'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.color = 'var(--spice-text)'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'var(--spice-subtext)'}
+                        title="Add to queue"
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15 15.5c0 1.93-1.57 3.5-3.5 3.5S8 17.43 8 15.5 9.57 12 11.5 12c.53 0 1.02.12 1.46.33V4.5h6v3h-4v8zM3 7h12v-2H3v2zm0 4h12v-2H3v2zm0 4h5v-2H3v2z"/></svg>
+                    </button>
+                    <button 
+                        onClick={() => {
+                            Spicetify.Player.playUri(msg.trackUri);
+                            try { Spicetify.showNotification?.(String("Playing now...")); } catch {}
                             Spicetify.PopupModal.hide();
                         }}
                         style={{
-                            flex: 2,
                             background: 'var(--spice-button)', color: 'var(--spice-button-text)',
-                            border: 'none', padding: '14px 24px', borderRadius: '32px',
-                            fontSize: '16px', fontWeight: 'bold', cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                            border: 'none', padding: '0 24px', height: '40px', borderRadius: '32px',
+                            fontSize: '15px', fontWeight: 'bold', cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                            display: 'flex', alignItems: 'center', gap: '6px'
                         }}
                     >
-                        Accept & Queue
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+                        Play
                     </button>
                 </div>
             </div>
+        </div>
+    );
+}
+
+// 5. Full Postcard Modal
+function showPostcardModal(msg: any, meta: any, onDelete?: () => void) {
+    const coverUrl = meta?.album?.images?.[0]?.url;
+    const trackName = meta?.name || (meta?.loading ? "Loading..." : "Unknown Track");
+    const artistName = meta?.artists?.[0]?.name || "";
+
+    Spicetify.PopupModal.display({
+        title: " ", // Use space to trick Spicetify's modal header but keep the (X) button intact
+        content: (
+            <PostcardContent 
+                msg={msg} 
+                trackName={trackName} 
+                artistName={artistName} 
+                coverUrl={coverUrl} 
+                onDelete={onDelete} 
+            />
         ) as any
     });
 }
@@ -187,13 +279,7 @@ function App() {
         Spicetify.LocalStorage.set("dedication:friends", JSON.stringify(newFriends));
     };
 
-    const getDaysAgo = (timestamp?: number) => {
-        if (!timestamp) return 'recently';
-        const days = Math.floor((Date.now() - timestamp) / (1000 * 60 * 60 * 24));
-        if (days === 0) return 'today';
-        if (days === 1) return 'yesterday';
-        return `${days} days ago`;
-    };
+
 
     return (
         <div style={{ padding: '32px', maxWidth: '1000px', margin: '0 auto', color: 'var(--spice-text)' }}>
