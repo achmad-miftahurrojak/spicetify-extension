@@ -164,9 +164,13 @@
     }
 
     function setupListeners() {
+        let currentItemNode = null;
+
         document.addEventListener("mouseover", (e) => {
             const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
             if (!item) return;
+            if (item === currentItemNode) return;
+            currentItemNode = item;
 
             const metadata = extractMetadata(item);
             if (!metadata.uri) return;
@@ -194,6 +198,7 @@
         document.addEventListener("mouseout", (e) => {
             const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
             if (item && !item.contains(e.relatedTarget)) {
+                currentItemNode = null;
                 currentHover = null;
                 clearTimeout(fetchTimer);
                 tooltip.classList.remove("visible");
