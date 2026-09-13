@@ -24,12 +24,12 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
     }, [deleteStep]);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', textAlign: 'center', padding: '0 8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', textAlign: 'center', padding: '0 8px' }}>
             <div style={{fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--spice-subtext)'}}>
                 A DEDICATION
             </div>
             
-            <div style={{ position: 'relative', width: '224px', height: '224px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 32px rgba(0,0,0,0.5)', marginTop: '4px' }}>
+            <div style={{ position: 'relative', width: '180px', height: '180px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 32px rgba(0,0,0,0.5)', marginTop: '2px' }}>
                 {coverUrl ? <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{width:'100%', height:'100%', background:'var(--spice-main)'}}/>}
                 
                 {/* Playful Stamp */}
@@ -44,12 +44,12 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
                 </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
-                <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '0', color: 'var(--spice-text)' }}>{trackName}</h2>
-                <span style={{ fontSize: '16px', color: 'var(--spice-subtext)' }}>{artistName}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '2px' }}>
+                <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0', color: 'var(--spice-text)' }}>{trackName}</h2>
+                <span style={{ fontSize: '15px', color: 'var(--spice-subtext)' }}>{artistName}</span>
             </div>
 
-            <div style={{ width: '100%', height: '1px', borderBottom: '1px dashed rgba(255,255,255,0.1)', margin: '8px 0' }} />
+            <div style={{ width: '100%', height: '1px', borderBottom: '1px dashed rgba(255,255,255,0.1)', margin: '6px 0' }} />
 
             <div style={{ width: '100%', fontSize: '17px', fontWeight: 400, color: 'var(--spice-text)', lineHeight: '1.5', position: 'relative', padding: '0 16px' }}>
                 <span style={{ fontSize: '24px', color: 'var(--spice-button)', opacity: 0.5, marginRight: '4px' }}>“</span>
@@ -58,7 +58,7 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
             </div>
 
             {/* Footer */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px', background: 'rgba(255,255,255,0.02)', padding: '8px 16px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px', background: 'rgba(255,255,255,0.02)', padding: '6px 16px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--spice-highlight-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold', color: 'var(--spice-text)', overflow: 'hidden' }}>
                     {msg.senderAvatar ? <img src={msg.senderAvatar} style={{width:'100%', height:'100%', objectFit:'cover'}} /> : senderInitial}
                 </div>
@@ -73,7 +73,7 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
             </div>
 
             {/* Action Bar */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginTop: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginTop: '12px' }}>
                 {/* Delete */}
                 <button 
                     onClick={() => {
