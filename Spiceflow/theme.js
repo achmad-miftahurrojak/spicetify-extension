@@ -1,37 +1,31 @@
 (function Spiceflow() {
-    console.log("Spiceflow: Script injected and running!");
-
     let currentHover = null;
+    let fetchTimer = null;
 
     const tooltip = document.createElement("div");
     tooltip.id = "spiceflow-tooltip";
     document.body.appendChild(tooltip);
 
     function extractMetadata(element) {
-        let uri = null;
-        
-        // 1. React Props Traversal untuk mencari URI
         let foundId = null;
+
         function searchNode(node) {
             if (foundId) return;
             const propKey = Object.keys(node).find(k => k.startsWith("__reactProps$"));
             if (!propKey) return;
-            
+
             const seen = new Set();
             function traverse(obj, depth = 0) {
                 if (foundId || depth > 5 || !obj || typeof obj !== 'object') return;
                 if (seen.has(obj)) return;
                 seen.add(obj);
-
                 for (const key in obj) {
                     const val = obj[key];
                     if (typeof val === 'string' && val.includes('spotify:playlist:')) {
                         foundId = val.split(':').pop();
                         return;
                     }
-                    if (val && typeof val === 'object') {
-                        traverse(val, depth + 1);
-                    }
+                    if (val && typeof val === 'object') traverse(val, depth + 1);
                 }
             }
             traverse(node[propKey]);
@@ -45,24 +39,84 @@
                 searchNode(children[i]);
             }
         }
-        
-        if (foundId) uri = `spotify:playlist:${foundId}`;
 
-        // 2. DOM Scraping untuk visual seketika (Instant Render)
+        const uri = foundId ? `spotify:playlist:${foundId}` : null;
         const img = element.querySelector("img");
         const image = img ? img.src : "";
-        
         const lines = element.innerText.split('\n').map(s => s.trim()).filter(Boolean);
-        let name = lines[0] || "Unknown Playlist";
-        let owner = "Spotify";
-        
-        // Contoh teks: "Playlist • Hamin"
+        const name = lines[0] || "Playlist";
         const subtitle = lines.find(l => l.includes("•"));
-        if (subtitle) {
-            owner = subtitle.split("•")[1].trim();
-        }
+        const owner = subtitle ? subtitle.split("•")[1].trim() : "Spotify";
 
         return { uri, name, owner, image };
+    }
+
+    function renderBase(metadata) {
+        return `
+            <div class="spf-cover-wrap">
+                ${metadata.image ? `<img src="${metadata.image}" class="spf-cover" />` : '<div class="spf-cover spf-cover-placeholder"></div>'}
+                <div class="spf-cover-gradient"></div>
+                <div class="spf-header-info">
+                    <div class="spf-title">${metadata.name}</div>
+                    <div class="spf-owner">Playlist · ${metadata.owner}</div>
+                </div>
+            </div>
+            <div class="spf-tracks" id="spf-tracks-list">
+                <div class="spf-tracks-loading">
+                    <span class="spf-dot"></span><span class="spf-dot"></span><span class="spf-dot"></span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderTracks(tracks) {
+        if (!tracks || tracks.length === 0) {
+            return '<div class="spf-tracks-empty">No tracks</div>';
+        }
+        return tracks.slice(0, 3).map((t, i) => `
+            <div class="spf-track-row">
+                <span class="spf-track-num">${i + 1}</span>
+                <div class="spf-track-thumb-wrap">
+                    ${t.image ? `<img class="spf-track-thumb" src="${t.image}" />` : '<div class="spf-track-thumb spf-track-thumb-empty"></div>'}
+                </div>
+                <div class="spf-track-meta">
+                    <div class="spf-track-name">${t.name}</div>
+                    <div class="spf-track-artist">${t.artist}</div>
+                </div>
+                <span class="spf-track-duration">${t.duration}</span>
+            </div>
+        `).join('');
+    }
+
+    function formatMs(ms) {
+        const s = Math.floor(ms / 1000);
+        return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    }
+
+    async function fetchTracks(playlistId, targetUri) {
+        try {
+            const res = await Spicetify.CosmosAsync.get(
+                `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=3&fields=items(track(name,duration_ms,artists,album(images)))`
+            );
+            if (currentHover !== targetUri) return;
+
+            const list = document.getElementById("spf-tracks-list");
+            if (!list) return;
+
+            const tracks = (res.items || [])
+                .filter(i => i.track && i.track.name)
+                .map(i => ({
+                    name: i.track.name,
+                    artist: (i.track.artists || []).map(a => a.name).join(', '),
+                    image: i.track.album?.images?.[2]?.url || i.track.album?.images?.[0]?.url || "",
+                    duration: formatMs(i.track.duration_ms)
+                }));
+
+            list.innerHTML = renderTracks(tracks);
+        } catch (e) {
+            const list = document.getElementById("spf-tracks-list");
+            if (list) list.innerHTML = '<div class="spf-tracks-empty">Could not load tracks</div>';
+        }
     }
 
     document.addEventListener("mouseover", (e) => {
@@ -71,45 +125,32 @@
 
         const metadata = extractMetadata(item);
         if (!metadata.uri) return;
-
         if (currentHover === metadata.uri) return;
 
         currentHover = metadata.uri;
-        
+        clearTimeout(fetchTimer);
+
         const rect = item.getBoundingClientRect();
-        const tooltipHeight = 190; // Ukuran card di CSS
-        
-        // Coba posisikan sejajar tengah dengan item
-        let topPos = rect.top + (rect.height / 2) - (tooltipHeight / 2);
-        
-        // Cegah keluar layar atas
-        if (topPos < 20) topPos = 20;
-        
-        // Cegah keluar layar bawah (terpotong)
-        if (topPos + tooltipHeight > window.innerHeight - 20) {
-            topPos = window.innerHeight - tooltipHeight - 20;
-        }
+        const cardH = 280;
+        let topPos = rect.top + (rect.height / 2) - (cardH / 2);
+        if (topPos < 16) topPos = 16;
+        if (topPos + cardH > window.innerHeight - 16) topPos = window.innerHeight - cardH - 16;
 
         tooltip.style.top = `${topPos}px`;
-        tooltip.style.left = `${rect.right + 15}px`;
-        
-        // INSTANT RENDER (0 detik) - Hapus bagian list track
-        tooltip.innerHTML = `
-            <div class="spiceflow-tooltip-content">
-                ${metadata.image ? `<img src="${metadata.image}" class="spiceflow-cover" />` : ''}
-                <div class="spiceflow-info">
-                    <div class="spiceflow-title">${metadata.name}</div>
-                    <div class="spiceflow-owner">Playlist • ${metadata.owner}</div>
-                </div>
-            </div>
-        `;
+        tooltip.style.left = `${rect.right + 12}px`;
+        tooltip.innerHTML = renderBase(metadata);
         tooltip.classList.add("visible");
+
+        const playlistId = metadata.uri.split(':').pop();
+        const capturedUri = metadata.uri;
+        fetchTimer = setTimeout(() => fetchTracks(playlistId, capturedUri), 120);
     });
 
     document.addEventListener("mouseout", (e) => {
         const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
         if (item && !item.contains(e.relatedTarget)) {
             currentHover = null;
+            clearTimeout(fetchTimer);
             tooltip.classList.remove("visible");
         }
     });
