@@ -31,17 +31,6 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
             
             <div style={{ position: 'relative', width: '180px', height: '180px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 32px rgba(0,0,0,0.5)', marginTop: '2px' }}>
                 {coverUrl ? <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{width:'100%', height:'100%', background:'var(--spice-main)'}}/>}
-                
-                {/* Playful Stamp */}
-                <div style={{
-                    position: 'absolute', top: '12px', right: '12px', width: '32px', height: '32px', 
-                    background: 'var(--spice-card)', opacity: 0.8, borderRadius: '6px', transform: 'rotate(5deg)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '16px', fontWeight: 'bold', color: 'var(--spice-text)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                }}>
-                    {senderInitial}
-                </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '2px' }}>
