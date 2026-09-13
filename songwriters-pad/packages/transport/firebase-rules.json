@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "dedications": {
+      "$friendCode": {
+        // Anyone can read (Receiver needs this to listen)
+        // Anyone can delete (Receiver uses pull-and-delete)
+        ".read": true,
+        ".write": true,
+        "$messageId": {
+          ".validate": "newData.hasChildren(['fromName', 'trackUri', 'message', 'timestamp']) && newData.child('message').val().length <= 140 && newData.child('timestamp').isNumber()"
+        }
+      }
+    }
+  }
+}

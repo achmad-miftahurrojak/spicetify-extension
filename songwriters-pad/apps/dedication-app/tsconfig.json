@@ -1,0 +1,10 @@
+{
+  "extends": "@swp/config/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react",
+    "jsxFactory": "Spicetify.React.createElement",
+    "jsxFragmentFactory": "Spicetify.React.Fragment"
+  },
+  "include": ["src", "../../packages/ui/src", "../../packages/transport/src"]
+}
