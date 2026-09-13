@@ -310,7 +310,7 @@ function App() {
                 </div>
 
                 {/* Right Content: Inbox */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '32px', minWidth: 0 }}>
                     <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--spice-subtext)' }}>
                         Inbox
                     </div>
@@ -422,7 +422,15 @@ function App() {
                                                 <div style={{ fontSize: '13px', color: 'var(--spice-subtext)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                     {artistName}
                                                 </div>
-                                                <div style={{ fontSize: '13px', color: 'var(--spice-subtext)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>
+                                                <div style={{ 
+                                                    fontSize: '13px', 
+                                                    color: 'var(--spice-subtext)', 
+                                                    marginTop: '2px',
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 2,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden'
+                                                }}>
                                                     {msg.message}
                                                 </div>
                                             </div>
