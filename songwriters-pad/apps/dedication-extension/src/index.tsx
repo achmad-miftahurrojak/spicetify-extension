@@ -205,23 +205,8 @@ function openSendModal(trackUri: string, transport: FirebaseTransport) {
         inbox.unshift(msg);
         Spicetify.LocalStorage.set("dedication:inbox", JSON.stringify(inbox));
 
-        Spicetify.showNotification(`New dedication from ${msg.fromName}!`);
+        Spicetify.showNotification(`New dedication from ${msg.fromName}! Check your Inbox.`);
         
-        // Auto-queue the received track
-        if (msg.trackUri) {
-            try {
-                if (typeof Spicetify.addToQueue === 'function') {
-                    Spicetify.addToQueue([{ uri: msg.trackUri }]);
-                } else if (Spicetify.Platform?.PlayerAPI?.addToQueue) {
-                    Spicetify.Platform.PlayerAPI.addToQueue([{ uri: msg.trackUri }]);
-                } else if (Spicetify.Queue?.enqueue) {
-                    Spicetify.Queue.enqueue(msg.trackUri);
-                }
-            } catch (e) {
-                console.error("Failed to auto-queue:", e);
-            }
-        }
-
         transport.deleteDedication(myCode, msg.id);
     });
 })();

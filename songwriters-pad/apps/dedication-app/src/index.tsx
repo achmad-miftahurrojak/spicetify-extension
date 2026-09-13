@@ -1,7 +1,7 @@
 import { DedicationPayload } from '@dedication/transport';
 
 // 5. Full Postcard Modal
-function showPostcardModal(msg: any, meta: any) {
+function showPostcardModal(msg: any, meta: any, onDelete?: () => void) {
     const coverUrl = meta?.album?.images?.[0]?.url;
     const trackName = meta?.name || (meta?.loading ? "Loading..." : "Unknown Track");
     const artistName = meta?.artists?.[0]?.name || "";
@@ -23,32 +23,51 @@ function showPostcardModal(msg: any, meta: any) {
                 <div style={{ color: 'var(--spice-subtext)', fontSize: '14px' }}>
                     Sent by <strong style={{color:'var(--spice-text)'}}>{msg.fromName}</strong> on {new Date(msg.timestamp).toLocaleDateString()}
                 </div>
-                <button 
-                    onClick={() => {
-                        try {
-                            if (typeof Spicetify.addToQueue === 'function') {
-                                Spicetify.addToQueue([{ uri: msg.trackUri }]);
-                            } else if (Spicetify.Platform?.PlayerAPI?.addToQueue) {
-                                Spicetify.Platform.PlayerAPI.addToQueue([{ uri: msg.trackUri }]);
-                            } else {
-                                Spicetify.Player.playUri(msg.trackUri);
+                <div style={{ display: 'flex', gap: '16px', width: '100%', marginTop: '8px' }}>
+                    <button 
+                        onClick={() => {
+                            if (confirm("Hapus dedication ini?")) {
+                                Spicetify.PopupModal.hide();
+                                onDelete?.();
                             }
-                            Spicetify.showNotification("Added to queue!");
-                        } catch (e) {
-                            Spicetify.Player.playUri(msg.trackUri);
-                            Spicetify.showNotification("Playing now...");
-                        }
-                        Spicetify.PopupModal.hide();
-                    }}
-                    style={{
-                        background: 'var(--spice-button)', color: 'var(--spice-button-text)',
-                        border: 'none', padding: '14px 32px', borderRadius: '32px',
-                        fontSize: '16px', fontWeight: 'bold', cursor: 'pointer',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                    }}
-                >
-                    Add to Queue
-                </button>
+                        }}
+                        style={{
+                            flex: 1,
+                            background: 'transparent', color: 'var(--spice-error, #e22134)',
+                            border: '1px solid var(--spice-error, #e22134)', padding: '14px 24px', borderRadius: '32px',
+                            fontSize: '16px', fontWeight: 'bold', cursor: 'pointer'
+                        }}
+                    >
+                        Delete
+                    </button>
+                    <button 
+                        onClick={() => {
+                            try {
+                                if (typeof Spicetify.addToQueue === 'function') {
+                                    Spicetify.addToQueue([{ uri: msg.trackUri }]);
+                                } else if (Spicetify.Platform?.PlayerAPI?.addToQueue) {
+                                    Spicetify.Platform.PlayerAPI.addToQueue([{ uri: msg.trackUri }]);
+                                } else {
+                                    Spicetify.Player.playUri(msg.trackUri);
+                                }
+                                Spicetify.showNotification("Accepted & added to queue!");
+                            } catch (e) {
+                                Spicetify.Player.playUri(msg.trackUri);
+                                Spicetify.showNotification("Playing now...");
+                            }
+                            Spicetify.PopupModal.hide();
+                        }}
+                        style={{
+                            flex: 2,
+                            background: 'var(--spice-button)', color: 'var(--spice-button-text)',
+                            border: 'none', padding: '14px 24px', borderRadius: '32px',
+                            fontSize: '16px', fontWeight: 'bold', cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                        }}
+                    >
+                        Accept & Queue
+                    </button>
+                </div>
             </div>
         ) as any
     });
@@ -114,6 +133,12 @@ function App() {
         const newReadState = { ...readState, [msgId]: true };
         setReadState(newReadState);
         Spicetify.LocalStorage.set("dedication:read", JSON.stringify(newReadState));
+    };
+
+    const deleteDedication = (msgId: string) => {
+        const newInbox = inbox.filter((m: any) => m.id !== msgId);
+        setInbox(newInbox);
+        Spicetify.LocalStorage.set("dedication:inbox", JSON.stringify(newInbox));
     };
 
     const addFriend = () => {
@@ -350,8 +375,28 @@ function App() {
                                         onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
                                         onClick={() => {
                                             markAsRead(msg.id);
-                                            showPostcardModal(msg, { name: trackName, artists: [{name: artistName}], album: { images: [{url: coverUrl}] } });
+                                            showPostcardModal(msg, { name: trackName, artists: [{name: artistName}], album: { images: [{url: coverUrl}] } }, () => deleteDedication(msg.id));
                                         }}>
+                                            {/* Delete Button Container */}
+                                            <div 
+                                                className="dedication-delete-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (confirm("Hapus dedication ini?")) {
+                                                        deleteDedication(msg.id);
+                                                    }
+                                                }}
+                                                style={{
+                                                    position: 'absolute', top: '12px', right: '12px', padding: '4px',
+                                                    background: 'rgba(0,0,0,0.5)', borderRadius: '50%', color: 'var(--spice-subtext)',
+                                                    cursor: 'pointer', zIndex: 2, display: 'flex', opacity: 0.5, transition: '0.2s'
+                                                }}
+                                                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                                                onMouseLeave={e => e.currentTarget.style.opacity = '0.5'}
+                                            >
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                                            </div>
+
                                             {/* Cover with Fallback */}
                                             <div style={{ width: '48px', height: '48px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: 'var(--spice-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--spice-subtext)', fontSize: '20px', fontWeight: 'bold' }}>
                                                 {coverUrl ? <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = trackName.charAt(0); }} /> : trackName.charAt(0)}
