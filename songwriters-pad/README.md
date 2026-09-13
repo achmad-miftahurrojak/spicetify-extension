@@ -58,7 +58,9 @@ Restart Spotify to apply changes.
 
 ## Usage
 
-A pen icon appears in the Spotify top bar after installation. Use the keyboard shortcut `Ctrl+Shift+.` to toggle the note panel.
+The note panel appears in the **Now Playing View** (the right-side panel in Spotify that opens when you click the currently playing track). Open Now Playing View in Spotify, then scroll down to find the Songwriter's Pad section.
+
+Use `Ctrl+Shift+.` to jump focus directly to the note input.
 
 To create a note, play a track, select a mode (Creator or Memory), and start typing. The note is saved to the current playback timestamp automatically.
 
