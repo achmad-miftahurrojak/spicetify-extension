@@ -68,12 +68,12 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
             } else {
                 const trackId = trackUri.split(':')[2];
                 if (trackId) {
-                    const res = await Spicetify.CosmosAsync.get('https://api.spotify.com/v1/tracks/' + trackId);
-                    const coverUrl = res.album?.images?.[0]?.url;
+                    const res = await Spicetify.CosmosAsync.get('wg://track/v1/' + trackId);
+                    const coverId = res.album?.coverGroup?.image?.[0]?.fileId;
                     meta = {
                         trackName: res.name || "",
-                        artistName: res.artists?.[0]?.name || "",
-                        coverUrl: coverUrl || ""
+                        artistName: res.artist?.[0]?.name || "",
+                        coverUrl: coverId ? `https://i.scdn.co/image/${coverId.toLowerCase()}` : ""
                     };
                 }
             }
