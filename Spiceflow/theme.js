@@ -8,17 +8,40 @@
     document.body.appendChild(tooltip);
 
     function extractMetadata(element) {
-        let uri = null;
-        
-        // Performant O(1) DOM lookup instead of expensive deep React prop traversal
-        const link = element.querySelector('a[href^="/playlist/"]');
-        if (link) {
-            // href is like "/playlist/37i9dQZF1DXcBWIGoYBM5M"
-            const href = link.getAttribute('href');
-            const id = href.split('/').pop();
-            uri = `spotify:playlist:${id}`;
+        let foundId = null;
+
+        function searchNode(node) {
+            if (foundId) return;
+            const propKey = Object.keys(node).find(k => k.startsWith("__reactProps$"));
+            if (!propKey) return;
+
+            const seen = new Set();
+            function traverse(obj, depth = 0) {
+                if (foundId || depth > 5 || !obj || typeof obj !== 'object') return;
+                if (seen.has(obj)) return;
+                seen.add(obj);
+                for (const key in obj) {
+                    const val = obj[key];
+                    if (typeof val === 'string' && val.includes('spotify:playlist:')) {
+                        foundId = val.split(':').pop();
+                        return;
+                    }
+                    if (val && typeof val === 'object') traverse(val, depth + 1);
+                }
+            }
+            traverse(node[propKey]);
         }
-        
+
+        searchNode(element);
+        if (!foundId) {
+            const children = element.querySelectorAll("*");
+            for (let i = 0; i < children.length; i++) {
+                if (foundId) break;
+                searchNode(children[i]);
+            }
+        }
+
+        const uri = foundId ? `spotify:playlist:${foundId}` : null;
         if (!uri) return { uri: null };
 
         const img = element.querySelector("img");
