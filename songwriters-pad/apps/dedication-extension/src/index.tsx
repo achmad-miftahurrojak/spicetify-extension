@@ -49,7 +49,7 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
     const handleSend = async () => {
         const targetCode = isManual ? manualCode.toUpperCase() : selectedCode;
         if (!targetCode || !message) {
-            Spicetify.showNotification("Friend code and message are required.", true);
+            try { Spicetify.showNotification?.(String("Friend code and message are required.")); } catch {}
             return;
         }
 
@@ -57,15 +57,25 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
         
         let meta: any = {};
         try {
-            const trackId = trackUri.split(':')[2];
-            if (trackId) {
-                const res = await Spicetify.CosmosAsync.get('wg://track/v1/' + trackId);
-                const coverId = res.album?.coverGroup?.image?.[0]?.fileId;
+            const currentTrack = Spicetify.Player.data.track;
+            if (currentTrack && currentTrack.uri === trackUri) {
+                const m = currentTrack.metadata;
                 meta = {
-                    trackName: res.name,
-                    artistName: res.artist?.[0]?.name || "",
-                    coverUrl: coverId ? `https://i.scdn.co/image/${coverId.toLowerCase()}` : undefined
+                    trackName: m.title || m.name || "",
+                    artistName: m.artist_name || "",
+                    coverUrl: m.image_xlarge_url || m.image_large_url || m.image_url || ""
                 };
+            } else {
+                const trackId = trackUri.split(':')[2];
+                if (trackId) {
+                    const res = await Spicetify.CosmosAsync.get('https://api.spotify.com/v1/tracks/' + trackId);
+                    const coverUrl = res.album?.images?.[0]?.url;
+                    meta = {
+                        trackName: res.name || "",
+                        artistName: res.artists?.[0]?.name || "",
+                        coverUrl: coverUrl || ""
+                    };
+                }
             }
         } catch (e) {
             console.error("Failed to fetch metadata before sending", e);
@@ -82,9 +92,9 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
         
         onClose();
         if (success) {
-            Spicetify.showNotification("Dedication sent successfully!");
+            try { Spicetify.showNotification?.(String("Dedication sent successfully!")); } catch {}
         } else {
-            Spicetify.showNotification("Failed to send dedication.", true);
+            try { Spicetify.showNotification?.(String("Failed to send dedication.")); } catch {}
         }
     };
 
@@ -205,7 +215,7 @@ function openSendModal(trackUri: string, transport: FirebaseTransport) {
         inbox.unshift(msg);
         Spicetify.LocalStorage.set("dedication:inbox", JSON.stringify(inbox));
 
-        Spicetify.showNotification(`New dedication from ${msg.fromName}! Check your Inbox.`);
+        try { Spicetify.showNotification?.(String(`New dedication from ${msg.fromName || 'Someone'}! Check your Inbox.`)); } catch {}
         
         transport.deleteDedication(myCode, msg.id);
     });
