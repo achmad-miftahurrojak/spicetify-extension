@@ -150,12 +150,12 @@ function SendModalContent({ trackUri, transport, initialFriendCode, onClose }: {
             )}
             
             {!isManual && friends.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '12px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Select Friend</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={{ fontSize: '11px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Select Friend</label>
                     <select 
                         value={selectedCode} 
                         onChange={e => setSelectedCode(e.target.value)}
-                        style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', fontSize: '14px', outline: 'none' }}
+                        style={{ padding: '0 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', fontSize: '14px', outline: 'none', height: '44px', boxSizing: 'border-box' }}
                     >
                         {friends.map(f => (
                             <option key={f.code} value={f.code} style={{ background: 'var(--spice-card)' }}>{f.name} ({f.code})</option>
@@ -163,36 +163,36 @@ function SendModalContent({ trackUri, transport, initialFriendCode, onClose }: {
                     </select>
                 </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '12px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Friend Code</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={{ fontSize: '11px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Friend Code</label>
                     <input 
                         placeholder="e.g. ABCD-1234"
                         value={manualCode}
                         onChange={e => setManualCode(e.target.value.toUpperCase())}
-                        style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontFamily: 'monospace', outline: 'none' }}
+                        style={{ padding: '0 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontFamily: 'monospace', outline: 'none', height: '44px', boxSizing: 'border-box' }}
                         maxLength={9}
                     />
                 </div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '12px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Sender Name</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '11px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Sender Name</label>
                 <input 
                     placeholder="Your Name (or Anonymous)"
                     value={fromName}
                     onChange={e => setFromName(e.target.value)}
-                    style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', outline: 'none' }}
+                    style={{ padding: '0 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', outline: 'none', height: '44px', boxSizing: 'border-box' }}
                     maxLength={30}
                 />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '12px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Message</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '11px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Message</label>
                 <textarea 
                     placeholder="Type your message here... (Max 140 chars)"
                     value={message}
                     onChange={e => setMessage(e.target.value)}
-                    style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', resize: 'none', height: '80px', fontSize: '14px', outline: 'none' }}
+                    style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', resize: 'none', height: '80px', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                     maxLength={140}
                 />
             </div>
