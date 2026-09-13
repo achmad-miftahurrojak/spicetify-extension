@@ -285,9 +285,6 @@ function App() {
                                             </div>
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{ fontWeight: '700', fontSize: '15px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{friend.name}</div>
-                                                <div style={{ color: 'var(--spice-subtext)', fontSize: '12px', fontFamily: 'monospace', marginTop: '4px' }}>
-                                                    {friend.code}
-                                                </div>
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <button 
