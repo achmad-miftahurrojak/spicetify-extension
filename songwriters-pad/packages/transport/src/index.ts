@@ -13,7 +13,7 @@ export interface DedicationMessage extends DedicationPayload {
 }
 
 export interface TransportConfig {
-    databaseUrl: string; // e.g. "https://my-project.firebaseio.com"
+    databaseUrl: string;
 }
 
 export class FirebaseTransport {
@@ -23,7 +23,6 @@ export class FirebaseTransport {
     private lastDisconnectTime: number = 0;
     
     constructor(config: TransportConfig) {
-        // Ensure URL doesn't end with a slash
         this.dbUrl = config.databaseUrl.endsWith('/') 
             ? config.databaseUrl.slice(0, -1) 
             : config.databaseUrl;
@@ -55,20 +54,17 @@ export class FirebaseTransport {
         }
     }
 
-    // 1. Lazy Cleanup Implementation (Zero-cost expiry)
     private async performLazyCleanup(friendCode: string, dedications: Record<string, DedicationPayload>) {
         const now = Date.now();
         const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
         
         for (const [id, msg] of Object.entries(dedications)) {
             if (msg.timestamp && (now - msg.timestamp) > THIRTY_DAYS) {
-                console.log(`[Transport] Lazy cleanup: Deleting expired message ${id}`);
                 await this.deleteDedication(friendCode, id);
             }
         }
     }
 
-    // 2. SSE Streaming Implementation
     listen(friendCode: string, onNewMessage: (msg: DedicationMessage) => void) {
         this.startSSE(friendCode, onNewMessage);
     }
@@ -100,15 +96,13 @@ export class FirebaseTransport {
             const decoder = new TextDecoder('utf-8');
             let buffer = '';
 
-            console.log("[Transport] SSE Connected");
-
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
                 
                 buffer += decoder.decode(value, { stream: true });
                 const lines = buffer.split('\n');
-                buffer = lines.pop() || ''; // Keep the last incomplete line for next chunk
+                buffer = lines.pop() || '';
 
                 let eventType = 'message';
                 for (let line of lines) {
@@ -128,7 +122,7 @@ export class FirebaseTransport {
                 }
             }
         }).catch(err => {
-            if (err.name === 'AbortError') return; // Expected termination via stop()
+            if (err.name === 'AbortError') return;
             
             console.error("[Transport] SSE Disconnected, entering fallback mode.", err);
             this.lastDisconnectTime = Date.now();
@@ -137,7 +131,6 @@ export class FirebaseTransport {
     }
 
     private handleSSEEvent(friendCode: string, eventType: string, data: any, onNewMessage: (msg: DedicationMessage) => void) {
-        // Firebase REST API returns events like 'put' or 'patch'
         if (eventType === 'put' || eventType === 'patch') {
             const path = data.path;
             const payload = data.data;
@@ -145,15 +138,12 @@ export class FirebaseTransport {
             if (!payload) return;
             
             if (path === '/') {
-                // Initial load: payload is an object of multiple dedications
                 this.performLazyCleanup(friendCode, payload);
                 for (const [id, msg] of Object.entries(payload)) {
                     onNewMessage({ id, ...(msg as DedicationPayload) });
                 }
             } else {
-                // New individual message: path is "/<messageId>"
                 const id = path.slice(1);
-                // Ensure the payload is not just a deletion (null)
                 if (payload.timestamp) {
                     onNewMessage({ id, ...(payload as DedicationPayload) });
                 }
@@ -161,24 +151,18 @@ export class FirebaseTransport {
         }
     }
 
-    // 3. Polling Fallback Implementation (30s)
     private startPolling(friendCode: string, onNewMessage: (msg: DedicationMessage) => void) {
         if (this.pollingInterval) return;
-        
-        console.log("[Transport] Starting fallback mechanism");
         
         const poll = async () => {
             const timeSinceDisconnect = Date.now() - this.lastDisconnectTime;
             
-            // If disconnected for less than 5 minutes, attempt to reconnect SSE first
             if (timeSinceDisconnect < 5 * 60 * 1000) {
-                console.log("[Transport] Reconnecting SSE (<5m disconnected)...");
                 this.stop();
                 this.startSSE(friendCode, onNewMessage);
                 return;
             }
 
-            console.log("[Transport] 30s Polling fetching data...");
             try {
                 const url = `${this.dbUrl}/dedications/${friendCode}.json`;
                 const response = await fetch(url);
@@ -195,7 +179,6 @@ export class FirebaseTransport {
             }
         };
 
-        // Poll every 30 seconds to strictly protect Free Tier quota (50k reads/day)
         this.pollingInterval = setInterval(poll, 30000);
     }
 }

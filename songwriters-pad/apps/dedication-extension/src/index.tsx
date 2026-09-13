@@ -1,7 +1,6 @@
 import { FirebaseTransport } from '@dedication/transport';
 
-// 1. Friend Code Generation
-const SAFE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclude O, 0, I, 1
+const SAFE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function generateFriendCode(): string {
     let code = '';
@@ -9,7 +8,7 @@ function generateFriendCode(): string {
         if (i === 4) code += '-';
         code += SAFE_ALPHABET[Math.floor(Math.random() * SAFE_ALPHABET.length)];
     }
-    return code; // e.g. "X7A9-K3M8"
+    return code;
 }
 
 function getOrGenerateFriendCode(): string {
@@ -21,7 +20,6 @@ function getOrGenerateFriendCode(): string {
     return code;
 }
 
-// 2. Context Menu & Quick Send
 function registerContextMenu(transport: FirebaseTransport) {
     new Spicetify.ContextMenu.Item(
         "Send Dedication",
@@ -30,7 +28,7 @@ function registerContextMenu(transport: FirebaseTransport) {
             const uri = uris[0];
             openSendModal(uri, transport);
         },
-        (uris: string[]) => uris.length > 0 && uris[0].includes("track"), // shouldAdd
+        (uris: string[]) => uris.length > 0 && uris[0].includes("track"),
         `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
     ).register();
 
@@ -240,16 +238,11 @@ function openSendModal(trackUri: string, transport: FirebaseTransport, initialFr
     );
 }
 
-// 5. Entry
 (async function main() {
     while (!Spicetify?.showNotification || !Spicetify?.ReactDOM) {
         await new Promise(r => setTimeout(r, 100));
     }
-
     const myCode = getOrGenerateFriendCode();
-    console.log(`[Dedication] My Friend Code: ${myCode}`);
-    
-
 
     const transport = new FirebaseTransport({
         databaseUrl: "https://dedication-spicetify-default-rtdb.firebaseio.com"
@@ -257,9 +250,6 @@ function openSendModal(trackUri: string, transport: FirebaseTransport, initialFr
 
     registerContextMenu(transport);
 
-    // Listen for incoming messages
-    // Note: We need to re-bind if the code changes, but for now we just use the current code.
-    // Ideally we should track the listener and un-listen, but Firebase realtime handles reconnection.
     transport.listen(myCode, (msg: any) => {
         const seenStr = Spicetify.LocalStorage.get("dedication:seen");
         const seen = seenStr ? JSON.parse(seenStr) : {};
