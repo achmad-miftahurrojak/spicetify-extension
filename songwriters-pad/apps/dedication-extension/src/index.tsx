@@ -68,17 +68,23 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
             } else {
                 const trackId = trackUri.split(':')[2];
                 if (trackId) {
-                    const res = await Spicetify.CosmosAsync.get('wg://track/v1/' + trackId);
-                    const coverId = res.album?.coverGroup?.image?.[0]?.fileId;
+                    const res = await Spicetify.CosmosAsync.get('https://api.spotify.com/v1/tracks/' + trackId);
+                    const coverUrl = res.album?.images?.[0]?.url;
                     meta = {
                         trackName: res.name || "",
-                        artistName: res.artist?.[0]?.name || "",
-                        coverUrl: coverId ? `https://i.scdn.co/image/${coverId.toLowerCase()}` : ""
+                        artistName: res.artists?.[0]?.name || "",
+                        coverUrl: coverUrl || ""
                     };
                 }
             }
         } catch (e) {
             console.error("Failed to fetch metadata before sending", e);
+        }
+
+        if (!meta.trackName) {
+            try { Spicetify.showNotification?.(String("Cannot fetch track info. Play the track first to send.")); } catch {}
+            setIsSending(false);
+            return;
         }
 
         const success = await transport.sendDedication(targetCode, {
