@@ -1,0 +1,1 @@
+module.exports = Spicetify.React;

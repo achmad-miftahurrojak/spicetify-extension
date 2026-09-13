@@ -1,5 +1,5 @@
 import { DedicationPayload } from '@dedication/transport';
-
+import { motion } from 'framer-motion';
 // Shared Helper
 const getDaysAgo = (timestamp?: number) => {
     if (!timestamp) return 'recently';
@@ -24,7 +24,12 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
     }, [deleteStep]);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', textAlign: 'center', padding: '0 8px' }}>
+        <motion.div 
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', textAlign: 'center', padding: '0 8px' }}
+        >
             <div style={{fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--spice-subtext)'}}>
                 A DEDICATION
             </div>
@@ -106,8 +111,7 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
                         onMouseEnter={e => e.currentTarget.style.color = 'var(--spice-text)'}
                         onMouseLeave={e => e.currentTarget.style.color = 'var(--spice-subtext)'}
                         title="Add to queue"
-                    >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15 15.5c0 1.93-1.57 3.5-3.5 3.5S8 17.43 8 15.5 9.57 12 11.5 12c.53 0 1.02.12 1.46.33V4.5h6v3h-4v8zM3 7h12v-2H3v2zm0 4h12v-2H3v2zm0 4h5v-2H3v2z"/></svg>
+                        <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M15 15H1v-1.5h14V15zm0-4.5H1V9h14v1.5zm-8-4.5v1.5H1V6h6z"></path></svg>
                     </button>
                     <button 
                         onClick={() => {
@@ -128,7 +132,7 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
                     </button>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
 
@@ -448,37 +452,41 @@ function App() {
                                     const senderInitial = senderName.charAt(0).toUpperCase();
 
                                     return (
-                                        <div key={idx} style={{
-                                            background: 'rgba(255,255,255,0.02)',
-                                            borderRadius: '12px',
-                                            padding: '14px 16px',
-                                            display: 'flex',
-                                            gap: '16px',
-                                            alignItems: 'center',
-                                            position: 'relative',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                            border: '1px solid rgba(255,255,255,0.06)',
-                                            transition: 'all 0.15s ease',
-                                            cursor: 'pointer'
-                                        }}
-                                        onMouseEnter={e => {
-                                            e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                                            e.currentTarget.style.transform = 'translateY(-2px)';
-                                            const btn = e.currentTarget.querySelector('.dedication-delete-btn') as HTMLElement;
-                                            if (btn) btn.style.opacity = '1';
-                                        }}
-                                        onMouseLeave={e => {
-                                            e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
-                                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            const btn = e.currentTarget.querySelector('.dedication-delete-btn') as HTMLElement;
-                                            if (btn) btn.style.opacity = '0';
-                                        }}
-                                        onClick={() => {
-                                            markAsRead(msg.id);
-                                            showPostcardModal(msg, { name: trackName, artists: [{name: artistName}], album: { images: [{url: coverUrl}] } }, () => deleteDedication(msg.id));
-                                        }}>
+                                        <motion.div key={idx} 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.05, duration: 0.3, ease: 'easeOut' }}
+                                            style={{
+                                                background: 'rgba(255,255,255,0.02)',
+                                                borderRadius: '12px',
+                                                padding: '14px 16px',
+                                                display: 'flex',
+                                                gap: '16px',
+                                                alignItems: 'center',
+                                                position: 'relative',
+                                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                                border: '1px solid rgba(255,255,255,0.06)',
+                                                transition: 'background 0.15s ease, border-color 0.15s ease, transform 0.15s ease',
+                                                cursor: 'pointer'
+                                            }}
+                                            onMouseEnter={e => {
+                                                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                const btn = e.currentTarget.querySelector('.dedication-delete-btn') as HTMLElement;
+                                                if (btn) btn.style.opacity = '1';
+                                            }}
+                                            onMouseLeave={e => {
+                                                e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                const btn = e.currentTarget.querySelector('.dedication-delete-btn') as HTMLElement;
+                                                if (btn) btn.style.opacity = '0';
+                                            }}
+                                            onClick={() => {
+                                                markAsRead(msg.id);
+                                                showPostcardModal(msg, { name: trackName, artists: [{name: artistName}], album: { images: [{url: coverUrl}] } }, () => deleteDedication(msg.id));
+                                            }}>
                                             {/* Unread Dot */}
                                             {!isRead && (
                                                 <div style={{ position: 'absolute', top: '24px', left: '16px', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--spice-button)', zIndex: 3, transform: 'translate(-50%, -50%)', border: '2px solid var(--spice-main)' }} />
@@ -542,7 +550,7 @@ function App() {
                                             >
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                                             </div>
-                                        </div>
+                                        </motion.div>
                                     );
                                 })}
                             </div>
