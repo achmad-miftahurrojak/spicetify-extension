@@ -1,6 +1,7 @@
 (function Spiceflow() {
     let currentHover = null;
     let fetchTimer = null;
+    const trackCache = new Map();
 
     const tooltip = document.createElement("div");
     tooltip.id = "spiceflow-tooltip";
@@ -97,6 +98,13 @@
         const cosmos = window.Spicetify?.CosmosAsync;
         if (!cosmos) return;
 
+        if (trackCache.has(playlistId)) {
+            if (currentHover !== targetUri) return;
+            const list = document.getElementById("spf-tracks-list");
+            if (list) list.innerHTML = renderTracks(trackCache.get(playlistId));
+            return;
+        }
+
         try {
             const res = await cosmos.get(
                 `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=3&fields=items(track(name,duration_ms,artists,album(images)))`
@@ -115,6 +123,7 @@
                     duration: formatMs(i.track.duration_ms)
                 }));
 
+            trackCache.set(playlistId, tracks);
             list.innerHTML = renderTracks(tracks);
         } catch (e) {
             if (currentHover !== targetUri) return;
@@ -148,7 +157,7 @@
 
             const playlistId = metadata.uri.split(':').pop();
             const capturedUri = metadata.uri;
-            fetchTimer = setTimeout(() => fetchTracks(playlistId, capturedUri), 200);
+            fetchTimer = setTimeout(() => fetchTracks(playlistId, capturedUri), 400);
         });
 
         document.addEventListener("mouseout", (e) => {
