@@ -3,7 +3,7 @@ import { DedicationPayload } from '@dedication/transport';
 // 5. Full Postcard Modal
 function showPostcardModal(msg: any, meta: any) {
     const coverUrl = meta?.album?.images?.[0]?.url;
-    const trackName = meta?.name || "Loading...";
+    const trackName = meta?.name || (meta?.loading ? "Loading..." : "Unknown Track");
     const artistName = meta?.artists?.[0]?.name || "";
 
     Spicetify.PopupModal.display({
@@ -25,7 +25,19 @@ function showPostcardModal(msg: any, meta: any) {
                 </div>
                 <button 
                     onClick={() => {
-                        Spicetify.Player.playUri(msg.trackUri);
+                        try {
+                            if (typeof Spicetify.addToQueue === 'function') {
+                                Spicetify.addToQueue([{ uri: msg.trackUri }]);
+                            } else if (Spicetify.Platform?.PlayerAPI?.addToQueue) {
+                                Spicetify.Platform.PlayerAPI.addToQueue([{ uri: msg.trackUri }]);
+                            } else {
+                                Spicetify.Player.playUri(msg.trackUri);
+                            }
+                            Spicetify.showNotification("Added to queue!");
+                        } catch (e) {
+                            Spicetify.Player.playUri(msg.trackUri);
+                            Spicetify.showNotification("Playing now...");
+                        }
                         Spicetify.PopupModal.hide();
                     }}
                     style={{
@@ -35,7 +47,7 @@ function showPostcardModal(msg: any, meta: any) {
                         boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
                     }}
                 >
-                    Play Track
+                    Add to Queue
                 </button>
             </div>
         ) as any
@@ -86,6 +98,9 @@ function App() {
                 if (!trackId) return;
                 try {
                     const res = await Spicetify.CosmosAsync.get('https://api.spotify.com/v1/tracks/' + trackId);
+                    if (res && (res.error || res.status >= 400)) {
+                        throw new Error("Rate limit or API error");
+                    }
                     setTracksMeta(prev => ({ ...prev, [msg.trackUri]: res }));
                 } catch (e) {
                     console.error("Failed to fetch track meta from API, falling back to internal", e);
