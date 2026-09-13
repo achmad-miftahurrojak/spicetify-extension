@@ -104,32 +104,35 @@
 
         try {
             const playlistApi = window.Spicetify?.Platform?.PlaylistAPI;
-            let tracks = [];
+            const cosmos = window.Spicetify?.CosmosAsync;
+            let tracks = null;
 
             if (playlistApi) {
-                // Use internal Spotify API (no rate limits)
-                const contents = await playlistApi.getContents(targetUri);
-                const items = contents?.items || [];
-                
-                tracks = items.slice(0, 3).map(i => {
-                    const durationMs = i.duration?.milliseconds || 0;
-                    const artists = i.artists ? i.artists.map(a => a.name).join(', ') : "Unknown Artist";
-                    let img = "";
-                    if (i.album?.images?.length > 0) {
-                        img = i.album.images[0].url;
+                try {
+                    const contents = await playlistApi.getContents(targetUri);
+                    const items = contents?.items || [];
+                    if (items.length > 0) {
+                        tracks = items.slice(0, 3).map(i => {
+                            const durationMs = i.duration?.milliseconds || 0;
+                            const artists = i.artists ? i.artists.map(a => a.name).join(', ') : "Unknown Artist";
+                            let img = "";
+                            if (i.album?.images?.length > 0) {
+                                img = i.album.images[0].url;
+                            }
+                            return {
+                                name: i.name,
+                                artist: artists,
+                                image: img,
+                                duration: formatMs(durationMs)
+                            };
+                        });
                     }
-                    return {
-                        name: i.name,
-                        artist: artists,
-                        image: img,
-                        duration: formatMs(durationMs)
-                    };
-                });
-            } else {
-                // Fallback to CosmosAsync if PlaylistAPI is missing
-                const cosmos = window.Spicetify?.CosmosAsync;
-                if (!cosmos) return;
-                
+                } catch (err) {
+                    console.error("Spiceflow: PlaylistAPI failed, falling back to Web API", err);
+                }
+            }
+
+            if (!tracks && cosmos) {
                 const res = await cosmos.get(
                     `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=3&fields=items(track(name,duration_ms,artists,album(images)))`
                 );
@@ -144,6 +147,8 @@
                     }));
             }
 
+            if (!tracks) throw new Error("No tracks found");
+
             if (currentHover !== targetUri) return;
             const list = document.getElementById("spf-tracks-list");
             if (!list) return;
@@ -151,6 +156,7 @@
             trackCache.set(targetUri, tracks);
             list.innerHTML = renderTracks(tracks);
         } catch (e) {
+            console.error("Spiceflow:", e);
             if (currentHover !== targetUri) return;
             const list = document.getElementById("spf-tracks-list");
             if (list) list.innerHTML = '<div class="spf-tracks-empty">Could not load tracks</div>';
