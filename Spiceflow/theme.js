@@ -94,8 +94,11 @@
     }
 
     async function fetchTracks(playlistId, targetUri) {
+        const cosmos = window.Spicetify?.CosmosAsync;
+        if (!cosmos) return;
+
         try {
-            const res = await Spicetify.CosmosAsync.get(
+            const res = await cosmos.get(
                 `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=3&fields=items(track(name,duration_ms,artists,album(images)))`
             );
             if (currentHover !== targetUri) return;
@@ -114,44 +117,56 @@
 
             list.innerHTML = renderTracks(tracks);
         } catch (e) {
+            if (currentHover !== targetUri) return;
             const list = document.getElementById("spf-tracks-list");
             if (list) list.innerHTML = '<div class="spf-tracks-empty">Could not load tracks</div>';
         }
     }
 
-    document.addEventListener("mouseover", (e) => {
-        const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
-        if (!item) return;
+    function setupListeners() {
+        document.addEventListener("mouseover", (e) => {
+            const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
+            if (!item) return;
 
-        const metadata = extractMetadata(item);
-        if (!metadata.uri) return;
-        if (currentHover === metadata.uri) return;
+            const metadata = extractMetadata(item);
+            if (!metadata.uri) return;
+            if (currentHover === metadata.uri) return;
 
-        currentHover = metadata.uri;
-        clearTimeout(fetchTimer);
-
-        const rect = item.getBoundingClientRect();
-        const cardH = 280;
-        let topPos = rect.top + (rect.height / 2) - (cardH / 2);
-        if (topPos < 16) topPos = 16;
-        if (topPos + cardH > window.innerHeight - 16) topPos = window.innerHeight - cardH - 16;
-
-        tooltip.style.top = `${topPos}px`;
-        tooltip.style.left = `${rect.right + 12}px`;
-        tooltip.innerHTML = renderBase(metadata);
-        tooltip.classList.add("visible");
-
-        const playlistId = metadata.uri.split(':').pop();
-        const capturedUri = metadata.uri;
-        fetchTimer = setTimeout(() => fetchTracks(playlistId, capturedUri), 120);
-    });
-
-    document.addEventListener("mouseout", (e) => {
-        const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
-        if (item && !item.contains(e.relatedTarget)) {
-            currentHover = null;
+            currentHover = metadata.uri;
             clearTimeout(fetchTimer);
-            tooltip.classList.remove("visible");
+
+            const rect = item.getBoundingClientRect();
+            const cardH = 280;
+            let topPos = rect.top + (rect.height / 2) - (cardH / 2);
+            if (topPos < 16) topPos = 16;
+            if (topPos + cardH > window.innerHeight - 16) topPos = window.innerHeight - cardH - 16;
+
+            tooltip.style.top = `${topPos}px`;
+            tooltip.style.left = `${rect.right + 12}px`;
+            tooltip.innerHTML = renderBase(metadata);
+            tooltip.classList.add("visible");
+
+            const playlistId = metadata.uri.split(':').pop();
+            const capturedUri = metadata.uri;
+            fetchTimer = setTimeout(() => fetchTracks(playlistId, capturedUri), 200);
+        });
+
+        document.addEventListener("mouseout", (e) => {
+            const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
+            if (item && !item.contains(e.relatedTarget)) {
+                currentHover = null;
+                clearTimeout(fetchTimer);
+                tooltip.classList.remove("visible");
+            }
+        });
+    }
+
+    async function waitForSpicetify() {
+        while (!window.Spicetify?.CosmosAsync || !window.Spicetify?.Platform) {
+            await new Promise(r => setTimeout(r, 300));
         }
-    });
+        setupListeners();
+    }
+
+    waitForSpicetify();
 })();
