@@ -241,114 +241,8 @@
         }
     }
 
-    // ── macOS Dock Magnification Engine ─────────────────────────────────────
-    const DOCK_MAX_SCALE   = 1.45;
-    const DOCK_MIN_SCALE   = 1.0;
-    const DOCK_EFFECT_HALF = 80; // px radius of magnification influence (vertical)
-    const DOCK_LERP        = 0.18;
-
-    let dockMouseY    = null; // cursor Y relative to the sidebar list container
-    let dockItems     = [];   // { el, baseH, currentScale }
-    let dockRafId     = null;
-    let dockContainer = null;
-
-    function getDockItems() {
-        const selector = ".main-yourLibraryX-listItem, .main-rootlist-rootlistItem";
-        const els = document.querySelectorAll(selector);
-        if (els.length === 0) return;
-
-        dockItems = Array.from(els).map(el => {
-            const baseH = el.getBoundingClientRect().height || 56;
-            return { el, baseH, currentScale: DOCK_MIN_SCALE };
-        });
-    }
-
-    function calcTargetScales() {
-        if (dockMouseY === null) return dockItems.map(() => DOCK_MIN_SCALE);
-
-        return dockItems.map(({ el }) => {
-            const rect = el.getBoundingClientRect();
-            const center = rect.top + rect.height / 2;
-            const dist = Math.abs(center - dockMouseY);
-
-            if (dist > DOCK_EFFECT_HALF) return DOCK_MIN_SCALE;
-
-            const theta = (dist / DOCK_EFFECT_HALF) * Math.PI;
-            const factor = (1 + Math.cos(theta)) / 2;
-            return DOCK_MIN_SCALE + factor * (DOCK_MAX_SCALE - DOCK_MIN_SCALE);
-        });
-    }
-
-    function dockTick() {
-        const targets = calcTargetScales();
-        let needMore = dockMouseY !== null;
-
-        dockItems.forEach((item, i) => {
-            const diff = targets[i] - item.currentScale;
-            if (Math.abs(diff) > 0.003) {
-                item.currentScale += diff * DOCK_LERP;
-                needMore = true;
-            } else {
-                item.currentScale = targets[i];
-            }
-
-            const s = item.currentScale;
-            item.el.style.transform       = `scaleY(${s})`;
-            item.el.style.transformOrigin = 'center center';
-            item.el.style.zIndex          = Math.round(s * 10).toString();
-        });
-
-        if (needMore) {
-            dockRafId = requestAnimationFrame(dockTick);
-        } else {
-            dockRafId = null;
-        }
-    }
-
-    function startDockRaf() {
-        if (!dockRafId) dockRafId = requestAnimationFrame(dockTick);
-    }
-
-    function setupDockMagnification() {
-        getDockItems();
-
-        document.addEventListener("mousemove", (e) => {
-            const sel = ".main-yourLibraryX-listItem, .main-rootlist-rootlistItem";
-            const hoveredItem = e.target.closest(sel);
-            if (hoveredItem) {
-                dockMouseY = e.clientY;
-                // Re-sync items lazily in case sidebar changed
-                if (dockItems.length === 0) getDockItems();
-                startDockRaf();
-            }
-        });
-
-        document.addEventListener("mouseleave", () => {
-            dockMouseY = null;
-            startDockRaf();
-        }, true);
-
-        // Reset when mouse leaves any sidebar item area
-        document.addEventListener("mouseover", (e) => {
-            const sel = ".main-yourLibraryX-listItem, .main-rootlist-rootlistItem";
-            if (!e.target.closest(sel)) {
-                dockMouseY = null;
-                startDockRaf();
-            }
-        });
-
-        // Re-index items when sidebar content mutates
-        const observer = new MutationObserver(() => {
-            getDockItems();
-        });
-        const sidebar = document.querySelector(".main-yourLibraryX-listContainer, [data-testid='rootlist-container']");
-        if (sidebar) observer.observe(sidebar, { childList: true, subtree: true });
-    }
-
     function setupListeners() {
         let currentItemNode = null;
-
-        setupDockMagnification();
 
         document.addEventListener("mouseover", (e) => {
             const item = e.target.closest(".main-yourLibraryX-listItem, .main-rootlist-rootlistItem");
@@ -399,11 +293,131 @@
         });
     }
 
+    // ── macOS Dock Magnification (React-based) ────────────────────────────────
+    function setupDockMagnification() {
+        const React = window.Spicetify.React;
+        const ReactDOM = window.Spicetify.ReactDOM;
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        const SEL = ".main-yourLibraryX-listItem, .main-rootlist-rootlistItem";
+        const MAX_SCALE = 1.5;
+        const EFFECT_RADIUS = 90;
+        const LERP = 0.22;
+
+        function DockEngine() {
+            const mouseY = useRef(null);
+            const items = useRef([]);
+            const scales = useRef([]);
+            const rafId = useRef(null);
+            const [, forceUpdate] = useState(0);
+
+            const syncItems = useCallback(() => {
+                const els = Array.from(document.querySelectorAll(SEL));
+                items.current = els;
+                if (scales.current.length !== els.length) {
+                    scales.current = els.map(() => 1.0);
+                }
+            }, []);
+
+            const cosScale = (dist) => {
+                if (dist >= EFFECT_RADIUS) return 1.0;
+                const t = (1 + Math.cos(Math.PI * dist / EFFECT_RADIUS)) / 2;
+                return 1.0 + t * (MAX_SCALE - 1.0);
+            };
+
+            const tick = useCallback(() => {
+                rafId.current = null;
+                let dirty = false;
+
+                items.current.forEach((el, i) => {
+                    const rect = el.getBoundingClientRect();
+                    const center = rect.top + rect.height / 2;
+                    const target = mouseY.current !== null
+                        ? cosScale(Math.abs(center - mouseY.current))
+                        : 1.0;
+
+                    const curr = scales.current[i] ?? 1.0;
+                    const diff = target - curr;
+                    const next = Math.abs(diff) > 0.002 ? curr + diff * LERP : target;
+                    if (Math.abs(next - curr) > 0.001) dirty = true;
+                    scales.current[i] = next;
+
+                    el.style.transform = `scale(${next})`;
+                    el.style.transformOrigin = 'left center';
+                    el.style.zIndex = next > 1.05 ? '2' : '';
+                });
+
+                if (dirty || mouseY.current !== null) {
+                    rafId.current = requestAnimationFrame(tick);
+                }
+            }, []);
+
+            const startRaf = useCallback(() => {
+                if (!rafId.current) rafId.current = requestAnimationFrame(tick);
+            }, [tick]);
+
+            useEffect(() => {
+                syncItems();
+                setTimeout(syncItems, 1500);
+                setTimeout(syncItems, 4000);
+
+                const onMove = (e) => {
+                    const inSidebar = e.target.closest(SEL);
+                    if (inSidebar) {
+                        if (items.current.length === 0) syncItems();
+                        mouseY.current = e.clientY;
+                        startRaf();
+                    } else if (mouseY.current !== null) {
+                        mouseY.current = null;
+                        startRaf();
+                    }
+                };
+
+                const onLeave = () => {
+                    mouseY.current = null;
+                    startRaf();
+                };
+
+                document.addEventListener("mousemove", onMove);
+                document.addEventListener("mouseleave", onLeave);
+
+                const sidebar = document.querySelector(
+                    ".main-yourLibraryX-listContainer, aside, [data-testid='Desktop.PanelContainer']"
+                );
+                let observer;
+                if (sidebar) {
+                    observer = new MutationObserver(syncItems);
+                    observer.observe(sidebar, { childList: true, subtree: true });
+                }
+
+                return () => {
+                    document.removeEventListener("mousemove", onMove);
+                    document.removeEventListener("mouseleave", onLeave);
+                    if (observer) observer.disconnect();
+                    if (rafId.current) cancelAnimationFrame(rafId.current);
+                };
+            }, [syncItems, startRaf]);
+
+            return null;
+        }
+
+        const mountNode = document.createElement("div");
+        mountNode.id = "spiceflow-dock-root";
+        document.body.appendChild(mountNode);
+
+        if (ReactDOM.createRoot) {
+            ReactDOM.createRoot(mountNode).render(React.createElement(DockEngine));
+        } else {
+            ReactDOM.render(React.createElement(DockEngine), mountNode);
+        }
+    }
+
     async function waitForSpicetify() {
         while (!window.Spicetify?.CosmosAsync || !window.Spicetify?.Platform || !window.Spicetify?.Player) {
             await new Promise(r => setTimeout(r, 300));
         }
         setupListeners();
+        setupDockMagnification();
     }
 
     waitForSpicetify();

@@ -1,8 +1,23 @@
 /* Hide Spotify's native tooltip when our modal is active to prevent double tooltips */
 #tippy-1, [data-tippy-root] {
-    /* Spotify uses Tippy.js for tooltips sometimes */
     display: none !important;
 }
+
+/* macOS Dock magnification support */
+.main-yourLibraryX-listContainer,
+.main-yourLibraryX-body,
+[data-testid="rootlist-container"],
+[data-overlayscrollbars-contents] {
+    overflow: visible !important;
+}
+.main-yourLibraryX-listItem,
+.main-rootlist-rootlistItem {
+    overflow: visible !important;
+    position: relative;
+    will-change: transform;
+    transform-origin: left center;
+}
+
 
 /* Spiceflow tooltip */
 #spiceflow-tooltip {
