@@ -201,27 +201,31 @@ function App() {
             <div style={{ display: 'flex', gap: '48px' }}>
                 
                 {/* Left Sidebar: Address Book */}
-                <div style={{ width: '280px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <div style={{ background: 'var(--spice-card)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--spice-button)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3 1.34-3 3 1.34 3 3 3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                            <h2 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0 }}>My Identity</h2>
-                        </div>
-                        <div style={{ fontSize: '13px', color: 'var(--spice-subtext)', marginBottom: '6px' }}>Your Friend Code:</div>
-                        <div style={{ 
-                            background: 'var(--spice-main)', padding: '16px', borderRadius: '12px', 
-                            fontSize: '24px', fontWeight: '900', letterSpacing: '4px', textAlign: 'center', 
-                            fontFamily: 'monospace', color: 'var(--spice-text)', border: '2px dashed rgba(255,255,255,0.1)' 
-                        }}>
-                            {friendCode}
-                        </div>
-                        <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-                            <button onClick={copyCode} style={{ flex: 1, padding: '12px', background: 'var(--spice-button)', color: 'var(--spice-button-text)', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                                Copy Code
-                            </button>
-                            <button onClick={regenerateCode} style={{ padding: '12px', background: 'transparent', color: 'var(--spice-subtext)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', cursor: 'pointer' }} title="Generate new code">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                            </button>
+                <div style={{ width: '320px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--spice-button)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3 1.34-3 3 1.34 3 3 3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                        <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>My Identity</h2>
+                    </div>
+                    
+                    <div style={{ background: 'var(--spice-card)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                        <div style={{ fontSize: '13px', color: 'var(--spice-subtext)', marginBottom: '12px', fontWeight: '500' }}>Your Friend Code</div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <div style={{ 
+                                flex: 1, background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '8px', 
+                                fontSize: '24px', fontWeight: 'bold', letterSpacing: '0.2em', textAlign: 'center', 
+                                fontFamily: 'monospace', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.06)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                {friendCode}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <button onClick={copyCode} style={{ background: 'var(--spice-highlight-elevated)', color: 'var(--spice-text)', border: 'none', borderRadius: '8px', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--spice-highlight-elevated)'} title="Copy Code">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                </button>
+                                <button onClick={regenerateCode} style={{ background: 'transparent', color: 'var(--spice-subtext)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'} title="Regenerate Code">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -236,22 +240,23 @@ function App() {
                                 placeholder="Friend's Name" 
                                 value={newFriendName}
                                 onChange={e => setNewFriendName(e.target.value)}
-                                style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--spice-button-disabled)', background: 'transparent', color: 'var(--spice-text)' }}
+                                style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)' }}
                             />
                             <input 
                                 type="text" 
                                 placeholder="Code (e.g. ABCD-1234)" 
                                 value={newFriendCode}
                                 onChange={e => setNewFriendCode(e.target.value)}
-                                style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--spice-button-disabled)', background: 'transparent', color: 'var(--spice-text)' }}
+                                style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', fontFamily: 'monospace' }}
                             />
                             <button 
                                 onClick={addFriend}
                                 disabled={!newFriendName || !newFriendCode}
                                 style={{ 
-                                    padding: '12px 24px', borderRadius: '8px', fontWeight: '700', border: 'none', cursor: 'pointer',
-                                    background: (newFriendName && newFriendCode) ? 'var(--spice-button)' : 'var(--spice-button-disabled)',
-                                    color: (newFriendName && newFriendCode) ? 'var(--spice-button-text)' : 'rgba(255,255,255,0.3)'
+                                    padding: '12px 24px', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: (newFriendName && newFriendCode) ? 'pointer' : 'default',
+                                    background: (newFriendName && newFriendCode) ? 'var(--spice-button)' : 'var(--spice-highlight-elevated)',
+                                    color: (newFriendName && newFriendCode) ? 'var(--spice-button-text)' : 'var(--spice-subtext)',
+                                    transition: 'all 0.15s ease'
                                 }}
                             >
                                 Save Friend
@@ -281,8 +286,8 @@ function App() {
                                         </button>
                                         <button 
                                             onClick={() => removeFriend(idx)}
-                                            style={{ background: 'transparent', border: 'none', color: 'var(--spice-subtext)', cursor: 'pointer', padding: '4px' }}
-                                            title="Remove"
+                                            style={{ background: 'transparent', color: 'var(--spice-subtext)', border: 'none', padding: '4px', cursor: 'pointer' }}
+                                            title="Remove friend"
                                         >
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                                         </button>
@@ -293,9 +298,9 @@ function App() {
                     </div>
                 </div>
 
-                {/* Right Area: Inbox */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--spice-subtext)', marginBottom: '16px' }}>
+                {/* Right Content: Inbox */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--spice-subtext)' }}>
                         Inbox
                     </div>
 
@@ -353,34 +358,77 @@ function App() {
                                     const artistName = msg.artistName || "Unknown Artist";
                                     const isRead = readState[msg.id];
                                     
-                                    let senderDisplay = <strong style={{color:'var(--spice-text)', textTransform: 'capitalize'}}>{msg.fromName}</strong>;
-                                    if (!msg.fromName || msg.fromName.toLowerCase() === 'anonymous') {
-                                        senderDisplay = <span style={{fontStyle: 'italic'}}>Someone</span>;
-                                    }
+                                    const senderName = msg.fromName && msg.fromName.toLowerCase() !== 'anonymous' ? msg.fromName : "Someone";
+                                    const senderInitial = senderName.charAt(0).toUpperCase();
 
                                     return (
                                         <div key={idx} style={{
-                                            background: 'var(--spice-card)',
-                                            borderRadius: '8px',
-                                            padding: '12px 16px',
+                                            background: 'rgba(255,255,255,0.02)',
+                                            borderRadius: '12px',
+                                            padding: '14px 16px',
                                             display: 'flex',
-                                            gap: '12px',
+                                            gap: '16px',
                                             alignItems: 'center',
                                             position: 'relative',
-                                            boxShadow: isRead ? 'none' : '0 4px 12px rgba(0,0,0,0.15)',
-                                            borderLeft: isRead ? '4px solid transparent' : '4px solid var(--spice-button)',
-                                            borderTop: '1px solid rgba(255,255,255,0.05)',
-                                            borderRight: '1px solid rgba(255,255,255,0.05)',
-                                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                            transition: 'transform 0.2s ease',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                            border: '1px solid rgba(255,255,255,0.06)',
+                                            transition: 'all 0.15s ease',
                                             cursor: 'pointer'
                                         }}
-                                        onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                                        onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                                        onMouseEnter={e => {
+                                            e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            const btn = e.currentTarget.querySelector('.dedication-delete-btn') as HTMLElement;
+                                            if (btn) btn.style.opacity = '1';
+                                        }}
+                                        onMouseLeave={e => {
+                                            e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            const btn = e.currentTarget.querySelector('.dedication-delete-btn') as HTMLElement;
+                                            if (btn) btn.style.opacity = '0';
+                                        }}
                                         onClick={() => {
                                             markAsRead(msg.id);
                                             showPostcardModal(msg, { name: trackName, artists: [{name: artistName}], album: { images: [{url: coverUrl}] } }, () => deleteDedication(msg.id));
                                         }}>
+                                            {/* Unread Dot */}
+                                            {!isRead && (
+                                                <div style={{ position: 'absolute', top: '24px', left: '16px', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--spice-button)', zIndex: 3, transform: 'translate(-50%, -50%)', border: '2px solid var(--spice-main)' }} />
+                                            )}
+
+                                            {/* Cover with Fallback */}
+                                            <div style={{ width: '56px', height: '56px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, background: 'var(--spice-highlight-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--spice-subtext)', fontSize: '24px', fontWeight: 'bold', position: 'relative' }}>
+                                                {coverUrl ? <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = trackName.charAt(0); }} /> : trackName.charAt(0)}
+                                            </div>
+                                            
+                                            {/* Info */}
+                                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, justifyContent: 'center', gap: '2px' }}>
+                                                <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--spice-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    {trackName}
+                                                </div>
+                                                <div style={{ fontSize: '13px', color: 'var(--spice-subtext)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    {artistName}
+                                                </div>
+                                                <div style={{ fontSize: '13px', color: 'var(--spice-subtext)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>
+                                                    {msg.message}
+                                                </div>
+                                            </div>
+
+                                            {/* Meta & Status: Sender Identity */}
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0, gap: '4px', minWidth: '64px' }}>
+                                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--spice-highlight-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', color: 'var(--spice-text)' }}>
+                                                    {senderInitial}
+                                                </div>
+                                                <div style={{ fontSize: '13px', fontWeight: '500', color: 'var(--spice-text)', textTransform: 'capitalize' }}>
+                                                    {senderName}
+                                                </div>
+                                                <div style={{ fontSize: '12px', color: 'var(--spice-subtext)', textTransform: 'capitalize' }}>
+                                                    {getDaysAgo(msg.timestamp)}
+                                                </div>
+                                            </div>
+
                                             {/* Delete Button Container */}
                                             <div 
                                                 className="dedication-delete-btn"
@@ -391,47 +439,16 @@ function App() {
                                                     }
                                                 }}
                                                 style={{
-                                                    position: 'absolute', top: '12px', right: '12px', padding: '4px',
-                                                    background: 'rgba(0,0,0,0.5)', borderRadius: '50%', color: 'var(--spice-subtext)',
-                                                    cursor: 'pointer', zIndex: 2, display: 'flex', opacity: 0.5, transition: '0.2s'
+                                                    position: 'absolute', top: '-8px', right: '-8px', padding: '6px',
+                                                    background: 'rgba(0,0,0,0.8)', borderRadius: '50%', color: 'var(--spice-subtext)',
+                                                    cursor: 'pointer', zIndex: 4, display: 'flex', opacity: 0, transition: '0.15s ease',
+                                                    border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
                                                 }}
-                                                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                                                onMouseLeave={e => e.currentTarget.style.opacity = '0.5'}
+                                                onMouseEnter={e => { e.currentTarget.style.color = '#e74c3c'; e.currentTarget.style.borderColor = '#e74c3c'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.color = 'var(--spice-subtext)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                                                title="Delete"
                                             >
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                                            </div>
-
-                                            {/* Cover with Fallback */}
-                                            <div style={{ width: '48px', height: '48px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: 'var(--spice-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--spice-subtext)', fontSize: '20px', fontWeight: 'bold' }}>
-                                                {coverUrl ? <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = trackName.charAt(0); }} /> : trackName.charAt(0)}
-                                            </div>
-                                            
-                                            {/* Info */}
-                                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, justifyContent: 'center', gap: '4px' }}>
-                                                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                    <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--spice-text)' }}>
-                                                        {trackName}
-                                                    </span>
-                                                    <span style={{ fontSize: '13px', color: 'var(--spice-subtext)' }}>
-                                                        {artistName}
-                                                    </span>
-                                                </div>
-                                                <div style={{
-                                                    fontSize: '13px', color: 'var(--spice-subtext)',
-                                                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                                                }}>
-                                                    "{msg.message}"
-                                                </div>
-                                            </div>
-
-                                            {/* Meta & Status */}
-                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', flexShrink: 0, gap: '4px' }}>
-                                                <div style={{ fontSize: '13px', color: 'var(--spice-subtext)' }}>
-                                                    From {senderDisplay}
-                                                </div>
-                                                <div style={{ fontSize: '11px', color: 'var(--spice-subtext)', textTransform: 'capitalize' }}>
-                                                    {getDaysAgo(msg.timestamp)}
-                                                </div>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                                             </div>
                                         </div>
                                     );
