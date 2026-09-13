@@ -21,7 +21,7 @@ function getOrGenerateFriendCode(): string {
     return code;
 }
 
-// 2. Context Menu
+// 2. Context Menu & Quick Send
 function registerContextMenu(transport: FirebaseTransport) {
     new Spicetify.ContextMenu.Item(
         "Send Dedication",
@@ -33,13 +33,23 @@ function registerContextMenu(transport: FirebaseTransport) {
         (uris: string[]) => uris.length > 0 && uris[0].includes("track"), // shouldAdd
         `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
     ).register();
+
+    window.addEventListener('dedication:quick_send', ((e: CustomEvent) => {
+        const friendCode = e.detail?.friendCode;
+        const currentTrack = Spicetify.Player.data.track || Spicetify.Player.data.item;
+        if (!currentTrack || !currentTrack.uri.includes('track')) {
+            try { Spicetify.showNotification?.(String("Play a track first to send a dedication!")); } catch {}
+            return;
+        }
+        openSendModal(currentTrack.uri, transport, friendCode);
+    }) as EventListener);
 }
 
-function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, transport: FirebaseTransport, onClose: () => void }) {
+function SendModalContent({ trackUri, transport, initialFriendCode, onClose }: { trackUri: string, transport: FirebaseTransport, initialFriendCode?: string, onClose: () => void }) {
     const fStr = Spicetify.LocalStorage.get("dedication:friends");
-    const friends: {name: string, code: string}[] = fStr ? JSON.parse(fStr) : [];
+    const friends: {name: string, code: string, avatar?: string}[] = fStr ? JSON.parse(fStr) : [];
     
-    const [selectedCode, setSelectedCode] = Spicetify.React.useState(friends.length > 0 ? friends[0].code : "");
+    const [selectedCode, setSelectedCode] = Spicetify.React.useState(initialFriendCode || (friends.length > 0 ? friends[0].code : ""));
     const [manualCode, setManualCode] = Spicetify.React.useState("");
     const [isManual, setIsManual] = Spicetify.React.useState(friends.length === 0);
     const [fromName, setFromName] = Spicetify.React.useState("");
@@ -184,7 +194,7 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
     );
 }
 
-function openSendModal(trackUri: string, transport: FirebaseTransport) {
+function openSendModal(trackUri: string, transport: FirebaseTransport, initialFriendCode?: string) {
     const container = document.createElement('div');
     Spicetify.PopupModal.display({
         title: "Send a Dedication",
@@ -195,6 +205,7 @@ function openSendModal(trackUri: string, transport: FirebaseTransport) {
         <SendModalContent 
             trackUri={trackUri} 
             transport={transport} 
+            initialFriendCode={initialFriendCode}
             onClose={() => {
                 Spicetify.PopupModal.hide();
                 setTimeout(() => Spicetify.ReactDOM.unmountComponentAtNode(container), 200);
