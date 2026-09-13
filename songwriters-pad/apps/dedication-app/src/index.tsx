@@ -111,6 +111,7 @@ function PostcardContent({ msg, trackName, artistName, coverUrl, onDelete }: any
                         onMouseEnter={e => e.currentTarget.style.color = 'var(--spice-text)'}
                         onMouseLeave={e => e.currentTarget.style.color = 'var(--spice-subtext)'}
                         title="Add to queue"
+                    >
                         <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M15 15H1v-1.5h14V15zm0-4.5H1V9h14v1.5zm-8-4.5v1.5H1V6h6z"></path></svg>
                     </button>
                     <button 
