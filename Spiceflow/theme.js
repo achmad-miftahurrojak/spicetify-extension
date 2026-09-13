@@ -8,46 +8,25 @@
     document.body.appendChild(tooltip);
 
     function extractMetadata(element) {
-        let foundId = null;
-
-        function searchNode(node) {
-            if (foundId) return;
-            const propKey = Object.keys(node).find(k => k.startsWith("__reactProps$"));
-            if (!propKey) return;
-
-            const seen = new Set();
-            function traverse(obj, depth = 0) {
-                if (foundId || depth > 5 || !obj || typeof obj !== 'object') return;
-                if (seen.has(obj)) return;
-                seen.add(obj);
-                for (const key in obj) {
-                    const val = obj[key];
-                    if (typeof val === 'string' && val.includes('spotify:playlist:')) {
-                        foundId = val.split(':').pop();
-                        return;
-                    }
-                    if (val && typeof val === 'object') traverse(val, depth + 1);
-                }
-            }
-            traverse(node[propKey]);
+        let uri = null;
+        
+        // Performant O(1) DOM lookup instead of expensive deep React prop traversal
+        const link = element.querySelector('a[href^="/playlist/"]');
+        if (link) {
+            // href is like "/playlist/37i9dQZF1DXcBWIGoYBM5M"
+            const href = link.getAttribute('href');
+            const id = href.split('/').pop();
+            uri = `spotify:playlist:${id}`;
         }
+        
+        if (!uri) return { uri: null };
 
-        searchNode(element);
-        if (!foundId) {
-            const children = element.querySelectorAll("*");
-            for (let i = 0; i < children.length; i++) {
-                if (foundId) break;
-                searchNode(children[i]);
-            }
-        }
-
-        const uri = foundId ? `spotify:playlist:${foundId}` : null;
         const img = element.querySelector("img");
         const image = img ? img.src : "";
         const lines = element.innerText.split('\n').map(s => s.trim()).filter(Boolean);
         const name = lines[0] || "Playlist";
-        const subtitle = lines.find(l => l.includes("•"));
-        const owner = subtitle ? subtitle.split("•")[1].trim() : "Spotify";
+        const subtitle = lines.find(l => l.includes("•") || l.includes("·"));
+        const owner = subtitle ? subtitle.split(/•|·/)[1].trim() : "Spotify";
 
         return { uri, name, owner, image };
     }
