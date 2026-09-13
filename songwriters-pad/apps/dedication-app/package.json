@@ -9,8 +9,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@dedication/transport": "workspace:*",
     "@swp/ui": "workspace:*",
-    "@dedication/transport": "workspace:*"
+    "framer-motion": "^13.2.0"
   },
   "devDependencies": {
     "@swp/config": "workspace:*",

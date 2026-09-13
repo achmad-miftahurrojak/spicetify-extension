@@ -16,7 +16,12 @@ const options = {
   jsx: "transform",
   jsxFactory: "Spicetify.React.createElement",
   jsxFragment: "Spicetify.React.Fragment",
-  external: ["react", "react-dom"],
+  external: [],
+  alias: {
+    "react": "./react-shim.js",
+    "react-dom": "./react-dom-shim.js",
+    "react/jsx-runtime": "./react-jsx-runtime-shim.js",
+  },
   logLevel: "info",
 };
 
