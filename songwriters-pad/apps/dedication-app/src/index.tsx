@@ -203,13 +203,11 @@ function App() {
                 
                 {/* Left Sidebar: Address Book */}
                 <div style={{ width: '320px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--spice-button)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3 1.34-3 3 1.34 3 3 3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                        <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>My Identity</h2>
+                    <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--spice-subtext)' }}>
+                        Your Code
                     </div>
                     
                     <div style={{ background: 'var(--spice-card)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                        <div style={{ fontSize: '13px', color: 'var(--spice-subtext)', marginBottom: '12px', fontWeight: '500' }}>Your Friend Code</div>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <div style={{ 
                                 flex: 1, background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '8px', 

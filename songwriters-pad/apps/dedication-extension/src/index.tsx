@@ -131,18 +131,18 @@ function SendModalContent({ trackUri, transport, initialFriendCode, onClose }: {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '8px' }}>
             {friends.length > 0 && (
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '4px' }}>
                     <button 
                         onClick={() => setIsManual(false)} 
-                        style={{ flex: 1, padding: '8px', background: !isManual ? 'var(--spice-button)' : 'transparent', color: !isManual ? 'var(--spice-button-text)' : 'var(--spice-text)', border: '1px solid var(--spice-button)', borderRadius: '4px', cursor: 'pointer' }}
+                        style={{ flex: 1, padding: '8px 12px', background: !isManual ? 'var(--spice-button)' : 'transparent', color: !isManual ? 'var(--spice-button-text)' : 'var(--spice-text)', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', transition: 'all 0.15s' }}
                     >
                         Address Book
                     </button>
                     <button 
                         onClick={() => setIsManual(true)} 
-                        style={{ flex: 1, padding: '8px', background: isManual ? 'var(--spice-button)' : 'transparent', color: isManual ? 'var(--spice-button-text)' : 'var(--spice-text)', border: '1px solid var(--spice-button)', borderRadius: '4px', cursor: 'pointer' }}
+                        style={{ flex: 1, padding: '8px 12px', background: isManual ? 'var(--spice-button)' : 'transparent', color: isManual ? 'var(--spice-button-text)' : 'var(--spice-text)', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', transition: 'all 0.15s' }}
                     >
                         Manual Code
                     </button>
@@ -150,45 +150,70 @@ function SendModalContent({ trackUri, transport, initialFriendCode, onClose }: {
             )}
             
             {!isManual && friends.length > 0 ? (
-                <select 
-                    value={selectedCode} 
-                    onChange={e => setSelectedCode(e.target.value)}
-                    style={{ padding: '8px', borderRadius: '4px', background: 'var(--spice-sidebar)', color: 'var(--spice-text)', border: '1px solid var(--spice-button)' }}
-                >
-                    {friends.map(f => (
-                        <option key={f.code} value={f.code}>{f.name} ({f.code})</option>
-                    ))}
-                </select>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '12px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Select Friend</label>
+                    <select 
+                        value={selectedCode} 
+                        onChange={e => setSelectedCode(e.target.value)}
+                        style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', fontSize: '14px', outline: 'none' }}
+                    >
+                        {friends.map(f => (
+                            <option key={f.code} value={f.code} style={{ background: 'var(--spice-card)' }}>{f.name} ({f.code})</option>
+                        ))}
+                    </select>
+                </div>
             ) : (
-                <input 
-                    placeholder="Friend Code (e.g. ABCD-1234)"
-                    value={manualCode}
-                    onChange={e => setManualCode(e.target.value.toUpperCase())}
-                    style={{ padding: '8px', borderRadius: '4px', background: 'var(--spice-sidebar)', color: 'var(--spice-text)', border: '1px solid var(--spice-button)' }}
-                    maxLength={9}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '12px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Friend Code</label>
+                    <input 
+                        placeholder="e.g. ABCD-1234"
+                        value={manualCode}
+                        onChange={e => setManualCode(e.target.value.toUpperCase())}
+                        style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontFamily: 'monospace', outline: 'none' }}
+                        maxLength={9}
+                    />
+                </div>
             )}
 
-            <input 
-                placeholder="Your Name (or Anonymous)"
-                value={fromName}
-                onChange={e => setFromName(e.target.value)}
-                style={{ padding: '8px', borderRadius: '4px', background: 'var(--spice-sidebar)', color: 'var(--spice-text)', border: '1px solid var(--spice-button)' }}
-                maxLength={30}
-            />
-            <textarea 
-                placeholder="Your Message (Max 140 chars)"
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                style={{ padding: '8px', borderRadius: '4px', background: 'var(--spice-sidebar)', color: 'var(--spice-text)', border: '1px solid var(--spice-button)', resize: 'none', height: '60px' }}
-                maxLength={140}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '12px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Sender Name</label>
+                <input 
+                    placeholder="Your Name (or Anonymous)"
+                    value={fromName}
+                    onChange={e => setFromName(e.target.value)}
+                    style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', outline: 'none' }}
+                    maxLength={30}
+                />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '12px', color: 'var(--spice-subtext)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Message</label>
+                <textarea 
+                    placeholder="Type your message here... (Max 140 chars)"
+                    value={message}
+                    onChange={e => setMessage(e.target.value)}
+                    style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', border: '1px solid rgba(255,255,255,0.1)', resize: 'none', height: '80px', fontSize: '14px', outline: 'none' }}
+                    maxLength={140}
+                />
+            </div>
+
             <button 
                 onClick={handleSend}
-                disabled={isSending}
-                style={{ padding: '10px', background: 'var(--spice-button)', color: 'var(--spice-button-text)', borderRadius: '4px', border: 'none', cursor: 'pointer', fontWeight: 'bold', opacity: isSending ? 0.5 : 1 }}
+                disabled={isSending || (!isManual && !selectedCode) || (isManual && manualCode.length < 9) || !message}
+                style={{ 
+                    marginTop: '8px',
+                    padding: '12px 24px', 
+                    background: (isSending || (!isManual && !selectedCode) || (isManual && manualCode.length < 9) || !message) ? 'var(--spice-highlight-elevated)' : 'var(--spice-button)', 
+                    color: (isSending || (!isManual && !selectedCode) || (isManual && manualCode.length < 9) || !message) ? 'var(--spice-subtext)' : 'var(--spice-button-text)', 
+                    borderRadius: '32px', 
+                    border: 'none', 
+                    cursor: (isSending || (!isManual && !selectedCode) || (isManual && manualCode.length < 9) || !message) ? 'default' : 'pointer', 
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    transition: 'all 0.15s ease'
+                }}
             >
-                {isSending ? "Sending..." : "Send"}
+                {isSending ? "Sending..." : "Send Dedication"}
             </button>
         </div>
     );
