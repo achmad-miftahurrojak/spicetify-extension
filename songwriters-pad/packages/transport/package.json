@@ -1,0 +1,14 @@
+{
+  "name": "@dedication/transport",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@swp/config": "workspace:*",
+    "typescript": "^5.5.0"
+  }
+}

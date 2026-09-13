@@ -1,0 +1,21 @@
+{
+  "name": "@dedication/extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@swp/ui": "workspace:*",
+    "@dedication/transport": "workspace:*"
+  },
+  "devDependencies": {
+    "@swp/config": "workspace:*",
+    "@types/react": "^18.3.0",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.5.0"
+  }
+}

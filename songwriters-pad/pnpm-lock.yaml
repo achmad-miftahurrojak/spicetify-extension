@@ -12,6 +12,50 @@ importers:
         specifier: ^2.1.0
         version: 2.10.12
 
+  apps/dedication-app:
+    dependencies:
+      '@dedication/transport':
+        specifier: workspace:*
+        version: link:../../packages/transport
+      '@swp/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+    devDependencies:
+      '@swp/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.31
+      esbuild:
+        specifier: ^0.23.0
+        version: 0.23.1
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  apps/dedication-extension:
+    dependencies:
+      '@dedication/transport':
+        specifier: workspace:*
+        version: link:../../packages/transport
+      '@swp/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+    devDependencies:
+      '@swp/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.31
+      esbuild:
+        specifier: ^0.23.0
+        version: 0.23.1
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
   apps/extension:
     dependencies:
       '@swp/core':
@@ -37,6 +81,15 @@ importers:
   packages/config: {}
 
   packages/core:
+    devDependencies:
+      '@swp/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/transport:
     devDependencies:
       '@swp/config':
         specifier: workspace:*
