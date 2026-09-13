@@ -82,6 +82,7 @@ function App() {
     const [friends, setFriends] = Spicetify.React.useState<{name: string, code: string, addedAt?: number}[]>([]);
     const [newFriendName, setNewFriendName] = Spicetify.React.useState("");
     const [newFriendCode, setNewFriendCode] = Spicetify.React.useState("");
+    const [searchQuery, setSearchQuery] = Spicetify.React.useState("");
     const [showHowItWorks, setShowHowItWorks] = Spicetify.React.useState(false);
 
     Spicetify.React.useEffect(() => {
@@ -182,8 +183,8 @@ function App() {
         try { Spicetify.showNotification?.(String(`Friend ${newFriendName} saved!`)); } catch {}
     };
 
-    const removeFriend = (idx: number) => {
-        const newFriends = friends.filter((_, i) => i !== idx);
+    const removeFriend = (code: string) => {
+        const newFriends = friends.filter(f => f.code !== code);
         setFriends(newFriends);
         Spicetify.LocalStorage.set("dedication:friends", JSON.stringify(newFriends));
     };
@@ -265,34 +266,51 @@ function App() {
 
                         {friends.length > 0 && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
-                                {friends.map((friend, idx) => (
-                                    <div key={idx} style={{ 
-                                        background: 'var(--spice-card)', padding: '12px 16px', borderRadius: '12px',
-                                        display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid rgba(255,255,255,0.1)'
-                                    }}>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: '700', fontSize: '16px' }}>{friend.name}</div>
-                                            <div style={{ color: 'var(--spice-subtext)', fontSize: '12px', fontFamily: 'monospace', marginTop: '4px' }}>
-                                                {friend.code}
+                                {friends.length >= 6 && (
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search friends..." 
+                                        value={searchQuery}
+                                        onChange={e => setSearchQuery(e.target.value)}
+                                        style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', color: 'var(--spice-text)', boxSizing: 'border-box' }}
+                                    />
+                                )}
+                                {friends.filter(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()) || f.code.toLowerCase().includes(searchQuery.toLowerCase())).map((friend) => {
+                                    const initial = friend.name.charAt(0).toUpperCase();
+                                    return (
+                                        <div key={friend.code} style={{ 
+                                            background: 'var(--spice-card)', padding: '12px 16px', borderRadius: '12px',
+                                            display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid rgba(255,255,255,0.1)'
+                                        }}>
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--spice-highlight-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 'bold', color: 'var(--spice-text)', flexShrink: 0 }}>
+                                                {initial}
+                                            </div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontWeight: '700', fontSize: '15px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{friend.name}</div>
+                                                <div style={{ color: 'var(--spice-subtext)', fontSize: '12px', fontFamily: 'monospace', marginTop: '4px' }}>
+                                                    {friend.code}
+                                                </div>
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                <button 
+                                                    onClick={() => {
+                                                        window.dispatchEvent(new CustomEvent('dedication:quick_send', { detail: { friendCode: friend.code } }));
+                                                    }}
+                                                    style={{ background: 'var(--spice-button)', color: 'var(--spice-button-text)', border: 'none', padding: '6px 16px', borderRadius: '32px', fontWeight: 'bold', cursor: 'pointer', fontSize: '11px' }}
+                                                >
+                                                    Send
+                                                </button>
+                                                <button 
+                                                    onClick={() => removeFriend(friend.code)}
+                                                    style={{ background: 'transparent', color: 'var(--spice-subtext)', border: 'none', padding: '4px', cursor: 'pointer', fontSize: '11px' }}
+                                                    title="Remove friend"
+                                                >
+                                                    Remove
+                                                </button>
                                             </div>
                                         </div>
-                                        <button 
-                                            onClick={() => {
-                                                try { Spicetify.showNotification?.(String(`Right-click any track, select 'Send Dedication', then choose ${friend.name}!`)); } catch {}
-                                            }}
-                                            style={{ background: 'var(--spice-button)', color: 'var(--spice-button-text)', border: 'none', padding: '6px 12px', borderRadius: '32px', fontWeight: 'bold', cursor: 'pointer', fontSize: '11px' }}
-                                        >
-                                            Send
-                                        </button>
-                                        <button 
-                                            onClick={() => removeFriend(idx)}
-                                            style={{ background: 'transparent', color: 'var(--spice-subtext)', border: 'none', padding: '4px', cursor: 'pointer' }}
-                                            title="Remove friend"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                                        </button>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
