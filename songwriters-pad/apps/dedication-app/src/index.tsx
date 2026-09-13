@@ -50,10 +50,10 @@ function showPostcardModal(msg: any, meta: any, onDelete?: () => void) {
                                 } else {
                                     Spicetify.Player.playUri(msg.trackUri);
                                 }
-                                Spicetify.showNotification("Accepted & added to queue!");
+                                try { Spicetify.showNotification?.(String("Accepted & added to queue!")); } catch {}
                             } catch (e) {
                                 Spicetify.Player.playUri(msg.trackUri);
-                                Spicetify.showNotification("Playing now...");
+                                try { Spicetify.showNotification?.(String("Playing now...")); } catch {}
                             }
                             Spicetify.PopupModal.hide();
                         }}
@@ -109,9 +109,9 @@ function App() {
 
     // Fetch logic removed completely as per Zero Fetch policy
 
-    const copyCode = () => {
+        const copyCode = () => {
         Spicetify.Platform.ClipboardAPI.copy(friendCode);
-        Spicetify.showNotification("Friend code copied!");
+        try { Spicetify.showNotification?.(String("Friend code copied!")); } catch {}
     };
 
     const regenerateCode = () => {
@@ -124,7 +124,7 @@ function App() {
             }
             Spicetify.LocalStorage.set("dedication:friend_code", newCode);
             window.dispatchEvent(new CustomEvent('dedication:code_changed'));
-            Spicetify.showNotification(`Regenerated! New Code: ${newCode}`);
+            try { Spicetify.showNotification?.(String(`Regenerated! New Code: ${newCode}`)); } catch {}
             window.dispatchEvent(new CustomEvent('dedication:rebind_transport', { detail: newCode }));
         }
     };
@@ -147,14 +147,14 @@ function App() {
         
         // Validation: 8 chars, hyphen in middle, safe alphabet
         if (!/^[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(code)) {
-            Spicetify.showNotification("Invalid code. Use format XXXX-XXXX (letters & numbers 2-9 only).", true);
+            try { Spicetify.showNotification?.(String("Invalid code. Use format XXXX-XXXX (letters & numbers 2-9 only).")); } catch {}
             return;
         }
 
         // Duplicate Code check
         const existingCode = friends.find(f => f.code === code);
         if (existingCode) {
-            Spicetify.showNotification(`Code already saved as ${existingCode.name}.`, true);
+            try { Spicetify.showNotification?.(String(`Code already saved as ${existingCode.name}.`)); } catch {}
             return;
         }
 
@@ -170,7 +170,7 @@ function App() {
             Spicetify.LocalStorage.set("dedication:friends", JSON.stringify(newFriends));
             setNewFriendName("");
             setNewFriendCode("");
-            Spicetify.showNotification(`Friend updated!`);
+            try { Spicetify.showNotification?.(String(`Friend updated!`)); } catch {}
             return;
         }
 
@@ -179,7 +179,7 @@ function App() {
         Spicetify.LocalStorage.set("dedication:friends", JSON.stringify(newFriends));
         setNewFriendName("");
         setNewFriendCode("");
-        Spicetify.showNotification(`Friend ${newFriendName} saved!`);
+        try { Spicetify.showNotification?.(String(`Friend ${newFriendName} saved!`)); } catch {}
     };
 
     const removeFriend = (idx: number) => {
@@ -272,7 +272,9 @@ function App() {
                                             </div>
                                         </div>
                                         <button 
-                                            onClick={() => Spicetify.showNotification(`Right-click any track, select 'Send Dedication', then choose ${friend.name}!`, false, 4000)}
+                                            onClick={() => {
+                                                try { Spicetify.showNotification?.(String(`Right-click any track, select 'Send Dedication', then choose ${friend.name}!`)); } catch {}
+                                            }}
                                             style={{ background: 'var(--spice-button)', color: 'var(--spice-button-text)', border: 'none', padding: '6px 12px', borderRadius: '32px', fontWeight: 'bold', cursor: 'pointer', fontSize: '11px' }}
                                         >
                                             Send
@@ -321,7 +323,9 @@ function App() {
                                         <span style={{ fontSize: '14px', color: 'var(--spice-subtext)' }}>Share your code</span>
                                     </div>
                                     <div 
-                                        onClick={() => Spicetify.showNotification("Right-click a track and select 'Send Dedication'!")}
+                                        onClick={() => {
+                                            try { Spicetify.showNotification?.(String("Right-click a track and select 'Send Dedication'!")); } catch {}
+                                        }}
                                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
                                     >
                                         <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--spice-subtext)"><path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H4V5h16v14zm-9-2h2v-2h-2v2zm0-4h2V7h-2v6z"/></svg>

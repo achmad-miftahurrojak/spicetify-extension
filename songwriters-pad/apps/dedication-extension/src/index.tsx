@@ -57,8 +57,12 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
         
         let meta: any = {};
         try {
-            const currentTrack = Spicetify.Player.data.track;
-            if (currentTrack && currentTrack.uri === trackUri) {
+            const currentTrack = Spicetify.Player.data.track || Spicetify.Player.data.item;
+            const getTrackId = (u?: string) => u?.split(':')[2]?.split('?')[0];
+            const currentId = getTrackId(currentTrack?.uri);
+            const targetId = getTrackId(trackUri);
+
+            if (currentId && targetId && currentId === targetId) {
                 const m = currentTrack.metadata;
                 meta = {
                     trackName: m.title || m.name || "",
