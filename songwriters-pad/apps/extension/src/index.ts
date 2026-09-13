@@ -187,7 +187,6 @@ function mount(): boolean {
     el.id = "swp-section";
     host.appendChild(el);
     refresh();
-    console.log("[swp] mounted into Now Playing View");
   } else if (el.parentElement !== host) {
     host.appendChild(el);
   }
@@ -221,7 +220,6 @@ async function main() {
     saveSettings({ ...settings, onboarded: true });
   }
 
-  console.log("[swp] initialized");
 }
 
 main().catch((err) => console.error("[swp] failed to initialize", err));
