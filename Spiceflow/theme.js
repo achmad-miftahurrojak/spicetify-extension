@@ -263,11 +263,11 @@
             clearTimeout(fetchTimer);
 
             const rect = item.getBoundingClientRect();
-            const cardH = 420;
-            let topPos = rect.top + (rect.height / 2) - (cardH / 2);
-            if (topPos < 16) topPos = 16;
-            if (topPos + cardH > window.innerHeight - 16) topPos = window.innerHeight - cardH - 16;
-
+            const cardH = 420; // Fixed max height
+            
+            // "patenkan berada di tengah app tapi tetap disebelah sidebar ... pas tengah dan rata kiri"
+            const topPos = (window.innerHeight / 2) - (cardH / 2);
+            
             tooltip.style.top = `${topPos}px`;
             tooltip.style.left = `${rect.right + 12}px`;
             tooltip.innerHTML = renderBase(metadata);
@@ -285,7 +285,7 @@
                 clearTimeout(hideTimer);
                 hideTimer = setTimeout(() => {
                     closeModal();
-                }, 400);
+                }, 600); // Increased to 600ms to allow mouse to travel to centered modal
             }
         });
     }
