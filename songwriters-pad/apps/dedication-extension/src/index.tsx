@@ -54,11 +54,29 @@ function SendModalContent({ trackUri, transport, onClose }: { trackUri: string, 
         }
 
         setIsSending(true);
+        
+        let meta: any = {};
+        try {
+            const trackId = trackUri.split(':')[2];
+            if (trackId) {
+                const res = await Spicetify.CosmosAsync.get('wg://track/v1/' + trackId);
+                const coverId = res.album?.coverGroup?.image?.[0]?.fileId;
+                meta = {
+                    trackName: res.name,
+                    artistName: res.artist?.[0]?.name || "",
+                    coverUrl: coverId ? `https://i.scdn.co/image/${coverId.toLowerCase()}` : undefined
+                };
+            }
+        } catch (e) {
+            console.error("Failed to fetch metadata before sending", e);
+        }
+
         const success = await transport.sendDedication(targetCode, {
             trackUri,
             message,
             fromName: fromName || 'Anonymous',
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            ...meta
         });
         setIsSending(false);
         

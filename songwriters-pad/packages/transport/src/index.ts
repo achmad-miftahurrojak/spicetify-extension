@@ -3,6 +3,9 @@ export interface DedicationPayload {
     trackUri: string;
     message: string;
     timestamp: number;
+    trackName?: string;
+    artistName?: string;
+    coverUrl?: string;
 }
 
 export interface DedicationMessage extends DedicationPayload {
