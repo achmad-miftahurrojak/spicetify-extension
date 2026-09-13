@@ -1,29 +1,36 @@
 # Spicetify Extensions
 
-A collection of custom extensions for Spicetify, enhancing the Spotify desktop client experience with additional features and functionalities.
+A collection of independent extensions and themes for [Spicetify](https://spicetify.app), each installable separately based on your needs.
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-## Repository Structure
+## Extensions
 
-This repository is organized as a monorepo containing multiple independent Spicetify extensions. Each extension resides in its own directory with dedicated documentation.
+| Extension | Description | Folder |
+|-----------|-------------|--------|
+| [Songwriter's Pad](./songwriters-pad) | Capture timestamped lyrics, chords, and memories directly inside Spotify. | `songwriters-pad/` |
+| [Dedication](./dedication) | Send song dedications to friends with a message and postcard view inside Spotify. | `dedication/` |
+| [Spiceflow](./Spiceflow) | A lightweight theme with smooth hover effects on sidebar icons. | `Spiceflow/` |
 
-### Available Extensions
+Each folder contains its own `README.md` with full installation instructions.
 
-| Extension | Description |
-|-----------|-------------|
-| [Songwriter's Pad](./songwriters-pad) | Capture timestamped lyrics, melodies, chords, and memories directly within the Spotify interface. |
+## Requirements
 
-## Installation
+- [Spicetify CLI](https://spicetify.app/docs/getting-started) v2.36 or higher
+- Spotify Desktop Application
 
-Each extension provides its own specific installation instructions. Please refer to the `README.md` file within the respective extension's directory for detailed setup guides.
+Extensions that require building from source also need:
+
+- Node.js 20 or higher
+- pnpm 9 or higher
 
 ## Contributing
 
-Contributions are welcome. If you wish to submit a new extension or improve an existing one, please ensure that your code adheres to the existing monorepo structure and includes comprehensive documentation.
+Contributions are welcome. Ensure that any new extension or change includes a `README.md` with installation steps, a features list, and a usage guide.
 
 ## License
 
-This repository and its contents are licensed under the [MIT License](LICENSE).
+This repository is licensed under the [MIT License](LICENSE).
 
-Disclaimer: Spicetify modifies the Spotify client, which violates the Spotify Terms of Service. Use at your own risk. Spotify client updates may temporarily break functionality.
+Disclaimer: Spicetify modifies the Spotify client, which may violate Spotify's Terms of Service. Use at your own risk. Spotify client updates may break functionality.
+
