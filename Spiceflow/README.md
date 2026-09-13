@@ -1,22 +1,61 @@
-# Spiceflow Theme
+# Spiceflow
 
-Spiceflow adalah tema ringan dan elegan untuk Spicetify yang memberikan efek interaktif pada antarmuka Spotify kamu. 
+A lightweight Spicetify theme that adds smooth hover interactions to the Spotify interface. Sidebar playlist icons and artist icons scale up with a soft shadow on hover, making the interface feel more responsive without changing the overall visual language.
 
-## Fitur Utama
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-- **Smooth Hover Effects:** Menambahkan efek *scale-up* (zoom) halus dan *box shadow* saat kamu mengarahkan kursor (hover) pada ikon playlist maupun ikon artis di sidebar. Bikin interaksi jadi lebih hidup!
+## Table of Contents
 
-## Instalasi
+- [Features](#features)
+- [Installation](#installation)
+- [Customization](#customization)
+- [License](#license)
 
-Pastikan kamu sudah menginstal [Spicetify CLI](https://spicetify.app/docs/getting-started) di sistem kamu.
+## Features
 
-### Cara Praktis (Satu Klik)
-Biar nggak ribet, kamu cukup menjalankan file installer yang sudah disediakan:
-- **Windows:** Klik dua kali pada file `install.bat`.
-- **Mac/Linux:** Buka terminal di dalam folder ini dan jalankan perintah `sh install.sh`.
+- Smooth scale-up effect on playlist and artist icons in the sidebar on hover.
+- Subtle box shadow accompanies the scale to add depth.
+- No changes to Spotify's default color scheme unless customized.
 
-Skrip tersebut akan otomatis menyalin tema ke folder yang benar dan langsung menerapkannya di Spotify kamu.
+## Installation
+
+Spicetify CLI must be installed before proceeding. See [spicetify.app/docs/getting-started](https://spicetify.app/docs/getting-started).
+
+### One-Click Installer
+
+**Windows:** Double-click `install.bat`.
+
+**macOS / Linux:** Open a terminal inside this folder and run:
+
+```bash
+sh install.sh
+```
+
+The script copies the theme files to the correct Spicetify directory and applies the theme automatically.
+
+### Manual Installation
+
+```bash
+# Copy theme files to Spicetify Themes directory
+cp color.ini user.css theme.js "$(spicetify config-dir)/Themes/Spiceflow/"
+
+# Set the theme and apply
+spicetify config current_theme Spiceflow
+spicetify config inject_theme_js 1
+spicetify apply
+```
 
 ## Customization
 
-Secara default, Spiceflow menggunakan skema warna dasar Spotify. Jika kamu ingin mengubah warnanya, kamu bisa mengedit nilai hex di file `color.ini` sesuai selera kamu, lalu jalankan kembali perintah `spicetify apply`.
+Spiceflow uses Spotify's default color scheme out of the box. To change colors, edit the hex values in `color.ini`, then run:
+
+```bash
+spicetify apply
+```
+
+## License
+
+This project is licensed under the [MIT License](../LICENSE).
+
+Disclaimer: Spicetify modifies the Spotify client, which may violate Spotify's Terms of Service. Use at your own risk. Spotify client updates may break functionality.
+
