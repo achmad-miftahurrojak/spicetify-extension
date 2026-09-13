@@ -56,7 +56,6 @@ function showPostcardModal(msg: any, meta: any) {
 
 function App() {
     const [inbox, setInbox] = Spicetify.React.useState<any[]>([]);
-    const [tracksMeta, setTracksMeta] = Spicetify.React.useState<Record<string, any>>({});
     const [friendCode, setFriendCode] = Spicetify.React.useState(Spicetify.LocalStorage.get("dedication:friend_code") || "Unknown");
     const [readState, setReadState] = Spicetify.React.useState<Record<string, boolean>>({});
     
@@ -89,37 +88,7 @@ function App() {
         return () => clearInterval(interval);
     }, []);
 
-    Spicetify.React.useEffect(() => {
-        inbox.forEach(async (msg) => {
-            if (!tracksMeta[msg.trackUri] && msg.trackUri) {
-                // Prevent duplicate fetches while pending
-                setTracksMeta(prev => ({ ...prev, [msg.trackUri]: { loading: true } }));
-                const trackId = msg.trackUri.split(':')[2];
-                if (!trackId) return;
-                try {
-                    const res = await Spicetify.CosmosAsync.get('https://api.spotify.com/v1/tracks/' + trackId);
-                    if (res && (res.error || res.status >= 400)) {
-                        throw new Error("Rate limit or API error");
-                    }
-                    setTracksMeta(prev => ({ ...prev, [msg.trackUri]: res }));
-                } catch (e) {
-                    console.error("Failed to fetch track meta from API, falling back to internal", e);
-                    try {
-                        const res = await Spicetify.CosmosAsync.get('wg://track/v1/' + trackId);
-                        const coverId = res.album?.coverGroup?.image?.[0]?.fileId;
-                        const coverUrl = coverId ? `https://i.scdn.co/image/${coverId.toLowerCase()}` : '';
-                        setTracksMeta(prev => ({ ...prev, [msg.trackUri]: {
-                            name: res.name,
-                            artists: res.artist,
-                            album: { images: [{ url: coverUrl }] }
-                        } }));
-                    } catch (e2) {
-                        setTracksMeta(prev => ({ ...prev, [msg.trackUri]: { error: true } }));
-                    }
-                }
-            }
-        });
-    }, [inbox]);
+    // Fetch logic removed completely as per Zero Fetch policy
 
     const copyCode = () => {
         Spicetify.Platform.ClipboardAPI.copy(friendCode);
@@ -350,10 +319,9 @@ function App() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 {inbox.map((msg, idx) => {
-                                    const meta = tracksMeta[msg.trackUri];
-                                    const coverUrl = msg.coverUrl || meta?.album?.images?.[0]?.url;
-                                    const trackName = msg.trackName || meta?.name || (meta?.loading ? "Loading..." : "Unknown Track");
-                                    const artistName = msg.artistName || meta?.artists?.[0]?.name || "";
+                                    const coverUrl = msg.coverUrl;
+                                    const trackName = msg.trackName || "Unknown Track";
+                                    const artistName = msg.artistName || "Unknown Artist";
                                     const isRead = readState[msg.id];
                                     
                                     let senderDisplay = <strong style={{color:'var(--spice-text)', textTransform: 'capitalize'}}>{msg.fromName}</strong>;
@@ -384,9 +352,9 @@ function App() {
                                             markAsRead(msg.id);
                                             showPostcardModal(msg, { name: trackName, artists: [{name: artistName}], album: { images: [{url: coverUrl}] } });
                                         }}>
-                                            {/* Cover */}
-                                            <div style={{ width: '48px', height: '48px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: 'var(--spice-main)' }}>
-                                                {coverUrl && <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                            {/* Cover with Fallback */}
+                                            <div style={{ width: '48px', height: '48px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: 'var(--spice-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--spice-subtext)', fontSize: '20px', fontWeight: 'bold' }}>
+                                                {coverUrl ? <img src={coverUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = trackName.charAt(0); }} /> : trackName.charAt(0)}
                                             </div>
                                             
                                             {/* Info */}
