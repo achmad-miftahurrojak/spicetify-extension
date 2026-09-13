@@ -95,35 +95,60 @@
     }
 
     async function fetchTracks(playlistId, targetUri) {
-        const cosmos = window.Spicetify?.CosmosAsync;
-        if (!cosmos) return;
-
-        if (trackCache.has(playlistId)) {
+        if (trackCache.has(targetUri)) {
             if (currentHover !== targetUri) return;
             const list = document.getElementById("spf-tracks-list");
-            if (list) list.innerHTML = renderTracks(trackCache.get(playlistId));
+            if (list) list.innerHTML = renderTracks(trackCache.get(targetUri));
             return;
         }
 
         try {
-            const res = await cosmos.get(
-                `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=3&fields=items(track(name,duration_ms,artists,album(images)))`
-            );
-            if (currentHover !== targetUri) return;
+            const playlistApi = window.Spicetify?.Platform?.PlaylistAPI;
+            let tracks = [];
 
+            if (playlistApi) {
+                // Use internal Spotify API (no rate limits)
+                const contents = await playlistApi.getContents(targetUri);
+                const items = contents?.items || [];
+                
+                tracks = items.slice(0, 3).map(i => {
+                    const durationMs = i.duration?.milliseconds || 0;
+                    const artists = i.artists ? i.artists.map(a => a.name).join(', ') : "Unknown Artist";
+                    let img = "";
+                    if (i.album?.images?.length > 0) {
+                        img = i.album.images[0].url;
+                    }
+                    return {
+                        name: i.name,
+                        artist: artists,
+                        image: img,
+                        duration: formatMs(durationMs)
+                    };
+                });
+            } else {
+                // Fallback to CosmosAsync if PlaylistAPI is missing
+                const cosmos = window.Spicetify?.CosmosAsync;
+                if (!cosmos) return;
+                
+                const res = await cosmos.get(
+                    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=3&fields=items(track(name,duration_ms,artists,album(images)))`
+                );
+                
+                tracks = (res.items || [])
+                    .filter(i => i.track && i.track.name)
+                    .map(i => ({
+                        name: i.track.name,
+                        artist: (i.track.artists || []).map(a => a.name).join(', '),
+                        image: i.track.album?.images?.[2]?.url || i.track.album?.images?.[0]?.url || "",
+                        duration: formatMs(i.track.duration_ms)
+                    }));
+            }
+
+            if (currentHover !== targetUri) return;
             const list = document.getElementById("spf-tracks-list");
             if (!list) return;
 
-            const tracks = (res.items || [])
-                .filter(i => i.track && i.track.name)
-                .map(i => ({
-                    name: i.track.name,
-                    artist: (i.track.artists || []).map(a => a.name).join(', '),
-                    image: i.track.album?.images?.[2]?.url || i.track.album?.images?.[0]?.url || "",
-                    duration: formatMs(i.track.duration_ms)
-                }));
-
-            trackCache.set(playlistId, tracks);
+            trackCache.set(targetUri, tracks);
             list.innerHTML = renderTracks(tracks);
         } catch (e) {
             if (currentHover !== targetUri) return;
