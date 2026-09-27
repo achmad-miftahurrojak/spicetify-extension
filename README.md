@@ -2,6 +2,8 @@
 
 # Spicetify Extensions
 
+[English](README.md) · [Bahasa Indonesia](README.id.md) · [한국어](README.ko.md)
+
 Small Spotify interface extensions and themes, each installable on its own.
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg) ![Spicetify](https://img.shields.io/badge/Spicetify-Extensions-1DB954?logo=spotify&logoColor=white)
@@ -53,4 +55,3 @@ Spiceflow/        # Theme files and installers
 [MIT](LICENSE)
 
 Spicetify changes the Spotify client and client updates can break extensions. Use these projects with that limitation in mind.
-
