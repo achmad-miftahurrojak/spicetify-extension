@@ -2,7 +2,7 @@
 
 # Spicetify Extensions
 
-<a href="README.md"><img alt="English" src="https://img.shields.io/badge/English-DFE0E5"></a> <a href="README.id.md"><img alt="Bahasa Indonesia" src="https://img.shields.io/badge/Bahasa%20Indonesia-DFE0E5"></a> <a href="README.ko.md"><img alt="한국어" src="https://img.shields.io/badge/%ED%95%9C%EA%B5%AD%EC%96%B4-DFE0E5"></a>
+<a href="../README.md"><img alt="English" src="https://img.shields.io/badge/English-DFE0E5"></a> <a href="README_ID.md"><img alt="Bahasa Indonesia" src="https://img.shields.io/badge/Bahasa%20Indonesia-DFE0E5"></a> <a href="README_KR.md"><img alt="한국어" src="https://img.shields.io/badge/%ED%95%9C%EA%B5%AD%EC%96%B4-DFE0E5"></a>
 
 <img alt="Spicetify" src="https://img.shields.io/badge/Spicetify-1DB954?logo=spotify&logoColor=white"> <img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg">
 
@@ -16,9 +16,9 @@
 
 | 프로젝트 | 설명 | 문서 |
 | --- | --- | --- |
-| [Songwriter's Pad](songwriters-pad/) | Spotify 안에서 timestamp가 있는 가사, 코드, 메모를 저장합니다. | [README](songwriters-pad/README.md) |
-| [Dedication](dedication/) | 메시지와 postcard 화면으로 노래를 보냅니다. | [README](dedication/README.md) |
-| [Spiceflow](Spiceflow/) | 가벼운 테마로 sidebar hover 효과를 추가합니다. | [README](Spiceflow/README.md) |
+| [Songwriter's Pad](../songwriters-pad/) | Spotify 안에서 timestamp가 있는 가사, 코드, 메모를 저장합니다. | [README](../songwriters-pad/README.md) |
+| [Dedication](../dedication/) | 메시지와 postcard 화면으로 노래를 보냅니다. | [README](../dedication/README.md) |
+| [Spiceflow](../Spiceflow/) | 가벼운 테마로 sidebar hover 효과를 추가합니다. | [README](../Spiceflow/README.md) |
 
 각 프로젝트는 자체 source, build 안내, 설치 파일을 제공합니다.
 
@@ -38,6 +38,7 @@
 
 ## 라이선스
 
-[MIT](LICENSE)
+[MIT](../LICENSE)
 
 Spicetify는 Spotify client를 수정하므로 client 업데이트로 확장 기능이 동작하지 않을 수 있습니다.
+
