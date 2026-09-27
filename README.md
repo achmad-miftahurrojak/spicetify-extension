@@ -2,11 +2,11 @@
 
 # Spicetify Extensions
 
-[English](README.md) · [Bahasa Indonesia](README.id.md) · [한국어](README.ko.md)
+<a href="README.md"><img alt="English" src="https://img.shields.io/badge/English-DFE0E5"></a> <a href="README.id.md"><img alt="Bahasa Indonesia" src="https://img.shields.io/badge/Bahasa%20Indonesia-DFE0E5"></a> <a href="README.ko.md"><img alt="한국어" src="https://img.shields.io/badge/%ED%95%9C%EA%B5%AD%EC%96%B4-DFE0E5"></a>
+
+<img alt="Spicetify" src="https://img.shields.io/badge/Spicetify-1DB954?logo=spotify&logoColor=white"> <img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg">
 
 Small Spotify interface extensions and themes, each installable on its own.
-
-![License](https://img.shields.io/badge/License-MIT-blue.svg) ![Spicetify](https://img.shields.io/badge/Spicetify-Extensions-1DB954?logo=spotify&logoColor=white)
 
 [Extensions](#extensions) · [Requirements](#requirements) · [Development](#development) · [License](#license)
 
