@@ -21,3 +21,9 @@ buildCustomApp.ts
 .codex/
 **/AGENTS.md
 **/CLAUDE.md
+!.env.sample
+!.env.*.sample
+# Local secret manifests
+**/secrets.yaml
+**/secrets.yml
+**/credentials.json
