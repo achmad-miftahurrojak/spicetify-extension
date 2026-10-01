@@ -4,3 +4,20 @@ CLAUDE.md
 songwriters-pad-prd-v1.1.md
 .gitattributes
 buildCustomApp.ts
+# Local credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.example.*
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+# Agent instructions and skill packs
+.claude/
+.codex/
+**/AGENTS.md
+**/CLAUDE.md
